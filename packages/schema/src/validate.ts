@@ -9,9 +9,18 @@ export interface ValidationIssue {
   message: string;
 }
 
-export type ValidationResult =
-  | { ok: true; doc: Doc; issues: [] }
-  | { ok: false; issues: ValidationIssue[] };
+export interface ValidationSuccess {
+  ok: true;
+  doc: Doc;
+  issues: [];
+}
+
+export interface ValidationFailure {
+  ok: false;
+  issues: ValidationIssue[];
+}
+
+export type ValidationResult = ValidationSuccess | ValidationFailure;
 
 /** `['root', 0, 'children', 1]` → `root[0].children[1]`. */
 export function formatPath(parts: readonly PropertyKey[], base = ''): string {

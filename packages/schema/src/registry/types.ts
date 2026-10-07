@@ -3,18 +3,8 @@ import type { z } from 'zod/v4';
 import type { Node } from '../document';
 import type { StyleKey } from '../style';
 
-export type ControlGroup =
-  | 'content'
-  | 'layout'
-  | 'spacing'
-  | 'typography'
-  | 'color'
-  | 'effects'
-  | 'visibility'
-  | 'data';
-
 /** Fixed inspector group order (SCHEMA.md §5). */
-export const CONTROL_GROUPS: readonly ControlGroup[] = [
+export const CONTROL_GROUPS = [
   'content',
   'layout',
   'spacing',
@@ -23,7 +13,8 @@ export const CONTROL_GROUPS: readonly ControlGroup[] = [
   'effects',
   'visibility',
   'data',
-];
+] as const;
+export type ControlGroup = (typeof CONTROL_GROUPS)[number];
 
 export type ControlKind =
   | 'token'

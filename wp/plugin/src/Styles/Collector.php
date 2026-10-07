@@ -77,7 +77,7 @@ final class Collector {
 		$tags = new \WP_HTML_Tag_Processor( $html );
 		while ( $tags->next_tag() ) {
 			$found = array();
-			foreach ( $tags->class_list() ?? array() as $class_name ) {
+			foreach ( $tags->class_list() as $class_name ) {
 				if ( str_starts_with( $class_name, self::PREFIX ) ) {
 					$found[] = $class_name;
 				}

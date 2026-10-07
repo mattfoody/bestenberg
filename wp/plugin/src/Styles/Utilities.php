@@ -113,27 +113,26 @@ final class Utilities {
 			static fn( array $a, array $b ): int => $a[0] <=> $b[0]
 		);
 
-		$out           = array();
-		$buffer        = array();
-		$current_media = '';
-
-		$flush = function () use ( &$out, &$buffer, &$current_media ): void {
-			if ( array() === $buffer ) {
-				return;
-			}
-			$css    = implode( '', $buffer );
-			$out[]  = '' === $current_media ? $css : '@media ' . $this->media[ $current_media ] . '{' . $css . '}';
-			$buffer = array();
-		};
-
+		// Group consecutive rules that share a media key.
+		$groups = array();
 		foreach ( $used as $rule ) {
-			if ( $rule[1] !== $current_media ) {
-				$flush();
-				$current_media = $rule[1];
+			$last = count( $groups ) - 1;
+			if ( $last >= 0 && $groups[ $last ]['media'] === $rule[1] ) {
+				$groups[ $last ]['css'] .= $rule[2];
+			} else {
+				$groups[] = array(
+					'media' => $rule[1],
+					'css'   => $rule[2],
+				);
 			}
-			$buffer[] = $rule[2];
 		}
-		$flush();
+
+		$out = array();
+		foreach ( $groups as $group ) {
+			$out[] = '' === $group['media']
+				? $group['css']
+				: '@media ' . $this->media[ $group['media'] ] . '{' . $group['css'] . '}';
+		}
 
 		return implode( "\n", $out );
 	}
