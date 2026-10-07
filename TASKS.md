@@ -6,8 +6,8 @@
 
 ## M0 — Repo & tooling
 
-- [ ] **0.1 Monorepo.** pnpm workspaces, root `package.json`, `tsconfig.base.json` (strict), `.nvmrc` (20), `.editorconfig`, `LICENSE` (GPL-2.0-or-later), `README.md`, `DECISIONS.md`, `CHANGELOG.md`.
-- [ ] **0.2 Packages.** Scaffold `packages/{schema,tokens,ai,adapter-blocks}` as `@bestenberg/*`: `src/index.ts`, build (tsup), Vitest, one passing test each.
+- [x] **0.1 Monorepo.** pnpm workspaces, root `package.json`, `tsconfig.base.json` (strict), `.nvmrc` (20), `.editorconfig`, `LICENSE` (GPL-2.0-or-later), `README.md`, `DECISIONS.md`, `CHANGELOG.md`.
+- [x] **0.2 Packages.** Scaffold `packages/{schema,tokens,ai,adapter-blocks}` as `@bestenberg/*`: `src/index.ts`, build (tsup), Vitest, one passing test each.
 - [ ] **0.3 Plugin.** `wp/plugin/bestenberg.php` header:
   - Plugin Name: Bestenberg · Author: Matt Foody · Author URI: https://mattfoody.com
   - Requires at least: 7.1 · Requires PHP: 8.1 · License: GPL-2.0-or-later · Text Domain: bestenberg

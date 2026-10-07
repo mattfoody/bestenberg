@@ -1,0 +1,21 @@
+{
+  "name": "@bestenberg/tokens",
+  "version": "0.0.0",
+  "description": "Bestenberg design tokens and generators (theme.json, CSS variables, utilities).",
+  "license": "GPL-2.0-or-later",
+  "author": "Matt Foody (https://mattfoody.com)",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --dts --clean",
+    "typecheck": "tsc --noEmit"
+  }
+}

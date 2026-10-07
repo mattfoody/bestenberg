@@ -1,0 +1,12 @@
+node_modules
+dist
+build
+vendor
+coverage
+playwright-report
+test-results
+pnpm-lock.yaml
+composer.lock
+*.md
+*.php
+LICENSE

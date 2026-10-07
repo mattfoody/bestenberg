@@ -1,0 +1,21 @@
+{
+  "name": "@bestenberg/ai",
+  "version": "0.0.0",
+  "description": "Bestenberg AI pipeline: prompt/screenshot to schema, validation and repair.",
+  "license": "GPL-2.0-or-later",
+  "author": "Matt Foody (https://mattfoody.com)",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --dts --clean",
+    "typecheck": "tsc --noEmit"
+  }
+}
