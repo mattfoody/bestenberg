@@ -41,7 +41,12 @@ test.describe('M1: token styles on the demo page', () => {
     for (const used of ['.bb\\:bg-primary{', '.bb\\:lg\\:grid-cols-3{', '.bb\\:shadow-md{']) {
       expect(css, used).toContain(used);
     }
-    for (const unused of ['.bb\\:py-24{', '.bb\\:shadow-xl{', '.bb\\:bg-danger{', '.bb\\:lg\\:grid-cols-12{']) {
+    for (const unused of [
+      '.bb\\:py-24{',
+      '.bb\\:shadow-xl{',
+      '.bb\\:bg-danger{',
+      '.bb\\:lg\\:grid-cols-12{',
+    ]) {
       expect(css, unused).not.toContain(unused);
     }
     // 552 utilities exist; a page should carry a small fraction of them.
