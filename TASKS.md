@@ -36,8 +36,8 @@
 - [x] **1.3 theme.json generator.** Presets from tokens; disable custom values (custom colors, gradients, font sizes, spacing units, line height, padding/margin free input); layout `contentSize`/`wideSize` from container tokens. Writes `wp/theme/theme.json`. Snapshot test.
 - [x] **1.4 CSS variables.** `--bb-*` custom properties file. Test.
 - [x] **1.5 Utility generator** (SCHEMA §6): `utilities.map.json` + `utilities.css`. Tests: Tailwind-style names with `bb:` prefix, mobile-first media query order, only token values, every style key covered. Print a size report.
-- [ ] **1.6 Schema package.** Types + zod for `Doc`, `Node`, `Style`, `Responsive`, `Binding` (SCHEMA §3); nanoid ids; uniqueness and nesting validation; JSON Schema export. Tests incl. invalid docs.
-- [ ] **1.7 Registry skeleton.** `ComponentDef`, `ControlDef`, `defineComponent`, `getComponent`, `listComponents`; shared control presets (spacing, typography, color, layout, visibility); `styleToClasses(style)` in TS. Register: `section`, `container`, `stack`, `row`, `grid`, `heading`, `text`, `button`, `image` (definitions only; `toBlock`/`fromBlock` come in M2).
+- [x] **1.6 Schema package.** Types + zod for `Doc`, `Node`, `Style`, `Responsive`, `Binding` (SCHEMA §3); nanoid ids; uniqueness and nesting validation; JSON Schema export. Tests incl. invalid docs.
+- [x] **1.7 Registry skeleton.** `ComponentDef`, `ControlDef`, `defineComponent`, `getComponent`, `listComponents`; shared control presets (spacing, typography, color, layout, visibility); `styleToClasses(style)` in TS. Register: `section`, `container`, `stack`, `row`, `grid`, `heading`, `text`, `button`, `image` (definitions only; `toBlock`/`fromBlock` come in M2).
 - [ ] **1.8 PHP style runtime.** `Bestenberg\Styles\Utilities` (loads map), `Collector` (records used classes during render), output of used rules only.
   - Block themes render the template before `wp_head`, so collection should finish in time. Verify; fall back to output buffering if needed and log it in DECISIONS.md.
   - Cache the per-page CSS by hash.
