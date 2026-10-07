@@ -36,7 +36,17 @@ test.describe('M0 smoke', () => {
         )}`,
       );
     }
-    await expect(page.locator('#adminmenumain')).toBeHidden();
+    // Full-screen: editor stylesheet loaded and the app covers the admin chrome.
+    const app = page.locator('.bestenberg-app');
+    await expect(app).toHaveCSS('position', 'fixed');
+    const coversChrome = await page.evaluate(() =>
+      [
+        [10, 10],
+        [20, 300],
+        [600, 400],
+      ].every(([x, y]) => document.elementFromPoint(x!, y!)?.closest('.bestenberg-app') != null),
+    );
+    expect(coversChrome, 'app should cover admin bar, menu and content').toBe(true);
     expect(errors).toEqual([]);
   });
 

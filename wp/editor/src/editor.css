@@ -1,5 +1,11 @@
-/* Full-screen mode: hide WP admin chrome on the Bestenberg page only. */
+/*
+ * Full-screen mode on the Bestenberg page only. The app covers the viewport
+ * above the admin chrome; hiding known chrome elements also removes them from
+ * the accessibility tree and stops their scripts' layout work.
+ */
 body.bestenberg-fullscreen #adminmenumain,
+body.bestenberg-fullscreen #adminmenuwrap,
+body.bestenberg-fullscreen #adminmenuback,
 body.bestenberg-fullscreen #wpadminbar,
 body.bestenberg-fullscreen #wpfooter {
   display: none;
@@ -18,6 +24,7 @@ html.wp-toolbar:has(body.bestenberg-fullscreen) {
 .bestenberg-app {
   position: fixed;
   inset: 0;
+  z-index: 100000; /* above #wpadminbar (99999) */
   display: grid;
   grid-template-rows: 56px 1fr;
   background: #f4f4f5;

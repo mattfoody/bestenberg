@@ -1,6 +1,6 @@
 import { createRoot } from '@wordpress/element';
 import { App } from './App';
-import './style.css';
+import './editor.css';
 
 const ROOT_ID = 'bestenberg-root';
 

@@ -36,7 +36,7 @@ jobs:
       - name: Verify editor build output
         run: |
           echo "::notice title=Editor build::$(ls wp/plugin/build/editor 2>&1 | tr '\n' ' ')"
-          test -f wp/plugin/build/editor/index.js && test -f wp/plugin/build/editor/index.asset.php
+          test -f wp/plugin/build/editor/index.js && test -f wp/plugin/build/editor/index.asset.php && test -f wp/plugin/build/editor/index.css
 
   php:
     name: PHP ${{ matrix.php }} (PHPCS, PHPStan)
@@ -90,7 +90,7 @@ jobs:
       - name: Verify editor build output
         run: |
           echo "::notice title=Editor build::$(ls wp/plugin/build/editor 2>&1 | tr '\n' ' ')"
-          test -f wp/plugin/build/editor/index.js && test -f wp/plugin/build/editor/index.asset.php
+          test -f wp/plugin/build/editor/index.js && test -f wp/plugin/build/editor/index.asset.php && test -f wp/plugin/build/editor/index.css
       - name: Start wp-env
         run: bin/ci-run.sh 'wp-env start' pnpm exec wp-env start
       - name: Verify plugin, theme and WooCommerce are active
