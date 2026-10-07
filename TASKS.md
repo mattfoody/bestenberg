@@ -14,8 +14,8 @@
   - Composer PSR-4 `Bestenberg\` → `src/`; `Plugin` bootstrap class; no logic yet.
 - [x] **0.4 Theme.** `wp/theme/` minimal block theme: `style.css` header (same author), placeholder `theme.json`, `templates/index.html`.
 - [x] **0.5 Editor app.** `wp/editor/` built with `@wordpress/scripts` (dependency extraction on). Admin menu "Bestenberg" opens a full-screen page mounting a React root that says "Bestenberg".
-- [ ] **0.6 Local env.** `.wp-env.json`: WP 7.1, PHP 8.3, plugin + theme mapped, WooCommerce installed, debug on. `pnpm env:start` / `env:stop` / `env:reset`.
-- [ ] **0.7 Quality tools.** ESLint + Prettier (TS/React), PHPCS (WPCS, `bestenberg` prefix rules), PHPStan level 6 with WP stubs, PHPUnit via wp-env, Playwright configured against wp-env.
+- [x] **0.6 Local env.** `.wp-env.json`: WP 7.1, PHP 8.3, plugin + theme mapped, WooCommerce installed, debug on. `pnpm env:start` / `env:stop` / `env:reset`.
+- [x] **0.7 Quality tools.** ESLint + Prettier (TS/React), PHPCS (WPCS, `bestenberg` prefix rules), PHPStan level 6 with WP stubs, PHPUnit via wp-env, Playwright configured against wp-env.
 - [ ] **0.8 CI (GitHub Actions).** Jobs: lint, typecheck, unit (Vitest), PHP (PHPCS, PHPStan, PHPUnit on PHP 8.1 + 8.3), e2e smoke (plugin + theme + Woo activate; admin page loads with no console errors).
 - [ ] **0.9 CLAUDE.md commands.** Fill in the real commands in CLAUDE.md.
 

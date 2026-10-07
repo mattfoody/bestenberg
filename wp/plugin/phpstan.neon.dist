@@ -1,0 +1,7 @@
+parameters:
+	level: 6
+	paths:
+		- bestenberg.php
+		- src
+	bootstrapFiles:
+		- tests/phpstan-bootstrap.php

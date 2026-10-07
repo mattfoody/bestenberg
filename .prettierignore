@@ -10,3 +10,6 @@ composer.lock
 *.md
 *.php
 LICENSE
+wp/theme/templates
+wp/theme/parts
+wp/theme/patterns
