@@ -1,10 +1,20 @@
 /**
- * @bestenberg/tokens — design tokens and generators.
- * Implemented in M1 (see TASKS.md 1.1–1.5).
+ * @bestenberg/tokens — design tokens and generators (SCHEMA.md §2, §6).
  */
+import tokensJson from './tokens.json';
+import { loadTokens, type Tokens } from './load';
 
-/** Prefix for CSS custom properties (`--bb-*`). */
-export const CSS_VAR_PREFIX = 'bb' as const;
+export * from './load';
+export * from './fluid';
+export * from './css-variables';
+export * from './theme-json';
+export * from './utilities';
+export * from './php-export';
+export * from './names-module';
+export * from './generated/names';
 
-/** Variant prefix for utility classes (`bb:py-4`). */
-export const UTILITY_PREFIX = 'bb' as const;
+/** The validated default token set. */
+export const tokens: Tokens = loadTokens(tokensJson);
+
+/** The raw DTCG document (for tooling that edits tokens). */
+export const tokensSource: unknown = tokensJson;

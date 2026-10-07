@@ -14,8 +14,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  # No lockfiles committed yet (see DECISIONS.md); switch to --frozen-lockfile once they are.
-  PNPM_INSTALL: pnpm install --no-frozen-lockfile
+  PNPM_INSTALL: pnpm install --frozen-lockfile
 
 jobs:
   js:
@@ -27,7 +26,6 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version-file: .nvmrc
-          package-manager-cache: false
       - run: ${{ env.PNPM_INSTALL }}
       - run: bin/ci-run.sh 'ESLint/Prettier' pnpm lint:js
       - run: bin/ci-run.sh 'Typecheck' pnpm typecheck
@@ -37,6 +35,12 @@ jobs:
         run: |
           echo "::notice title=Editor build::$(ls wp/plugin/build/editor 2>&1 | tr '\n' ' ')"
           test -f wp/plugin/build/editor/index.js && test -f wp/plugin/build/editor/index.asset.php && test -f wp/plugin/build/editor/index.css
+      - name: Generated files are up to date
+        run: |
+          if ! git diff --exit-code --stat; then
+            echo "::error title=Stale generated files::Run 'pnpm build' (or 'pnpm generate') and commit the result."
+            exit 1
+          fi
 
   php:
     name: PHP ${{ matrix.php }} (PHPCS, PHPStan)
@@ -78,7 +82,6 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version-file: .nvmrc
-          package-manager-cache: false
       - uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}

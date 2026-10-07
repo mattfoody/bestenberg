@@ -25,17 +25,17 @@
 
 ## M1 — Tokens, schema, base theme
 
-- [ ] **1.1 Default tokens** (`packages/tokens/tokens.json`, DTCG):
+- [x] **1.1 Default tokens** (`packages/tokens/tokens.json`, DTCG):
   - color (semantic): `primary`, `on-primary`, `accent`, `surface`, `surface-alt`, `on-surface`, `muted`, `border`, `success`, `warning`, `danger`
   - space: `0, 1, 2, 3, 4, 5, 6, 8, 10, 12, 16, 20, 24` (rem scale)
   - fontSize (fluid clamp): `xs, sm, base, lg, xl, 2xl, 3xl, 4xl, 5xl`
   - fontFamily `sans, serif, mono` · fontWeight `regular, medium, semibold, bold` · lineHeight `tight, snug, normal, relaxed`
   - radius `none, sm, md, lg, xl, full` · shadow `none, sm, md, lg, xl`
   - container `sm, md, lg, xl, 2xl` · breakpoint `md` (768px), `lg` (1024px)
-- [ ] **1.2 Token loader.** Zod validation + generated TS union types per category (`SpaceToken`, `ColorToken`, …).
-- [ ] **1.3 theme.json generator.** Presets from tokens; disable custom values (custom colors, gradients, font sizes, spacing units, line height, padding/margin free input); layout `contentSize`/`wideSize` from container tokens. Writes `wp/theme/theme.json`. Snapshot test.
-- [ ] **1.4 CSS variables.** `--bb-*` custom properties file. Test.
-- [ ] **1.5 Utility generator** (SCHEMA §6): `utilities.map.json` + `utilities.css`. Tests: Tailwind-style names with `bb:` prefix, mobile-first media query order, only token values, every style key covered. Print a size report.
+- [x] **1.2 Token loader.** Zod validation + generated TS union types per category (`SpaceToken`, `ColorToken`, …).
+- [x] **1.3 theme.json generator.** Presets from tokens; disable custom values (custom colors, gradients, font sizes, spacing units, line height, padding/margin free input); layout `contentSize`/`wideSize` from container tokens. Writes `wp/theme/theme.json`. Snapshot test.
+- [x] **1.4 CSS variables.** `--bb-*` custom properties file. Test.
+- [x] **1.5 Utility generator** (SCHEMA §6): `utilities.map.json` + `utilities.css`. Tests: Tailwind-style names with `bb:` prefix, mobile-first media query order, only token values, every style key covered. Print a size report.
 - [ ] **1.6 Schema package.** Types + zod for `Doc`, `Node`, `Style`, `Responsive`, `Binding` (SCHEMA §3); nanoid ids; uniqueness and nesting validation; JSON Schema export. Tests incl. invalid docs.
 - [ ] **1.7 Registry skeleton.** `ComponentDef`, `ControlDef`, `defineComponent`, `getComponent`, `listComponents`; shared control presets (spacing, typography, color, layout, visibility); `styleToClasses(style)` in TS. Register: `section`, `container`, `stack`, `row`, `grid`, `heading`, `text`, `button`, `image` (definitions only; `toBlock`/`fromBlock` come in M2).
 - [ ] **1.8 PHP style runtime.** `Bestenberg\Styles\Utilities` (loads map), `Collector` (records used classes during render), output of used rules only.

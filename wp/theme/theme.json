@@ -3,9 +3,175 @@
   "version": 3,
   "settings": {
     "appearanceTools": false,
-    "layout": {
-      "contentSize": "720px",
-      "wideSize": "1200px"
+    "useRootPaddingAwareAlignments": false,
+    "border": { "color": false, "radius": false, "style": false, "width": false },
+    "color": {
+      "custom": false,
+      "customDuotone": false,
+      "customGradient": false,
+      "defaultDuotone": false,
+      "defaultGradients": false,
+      "defaultPalette": false,
+      "duotone": [],
+      "gradients": [],
+      "palette": [
+        { "slug": "primary", "name": "Primary", "color": "#1d4ed8" },
+        { "slug": "on-primary", "name": "On primary", "color": "#ffffff" },
+        { "slug": "accent", "name": "Accent", "color": "#f59e0b" },
+        { "slug": "surface", "name": "Surface", "color": "#ffffff" },
+        { "slug": "surface-alt", "name": "Surface alt", "color": "#f4f4f5" },
+        { "slug": "on-surface", "name": "On surface", "color": "#18181b" },
+        { "slug": "muted", "name": "Muted", "color": "#71717a" },
+        { "slug": "border", "name": "Border", "color": "#e4e4e7" },
+        { "slug": "success", "name": "Success", "color": "#16a34a" },
+        { "slug": "warning", "name": "Warning", "color": "#d97706" },
+        { "slug": "danger", "name": "Danger", "color": "#dc2626" }
+      ]
+    },
+    "layout": { "contentSize": "48rem", "wideSize": "80rem" },
+    "shadow": {
+      "defaultPresets": false,
+      "presets": [
+        { "slug": "sm", "name": "SM", "shadow": "0 1px 2px 0 rgb(0 0 0 / 0.05)" },
+        {
+          "slug": "md",
+          "name": "MD",
+          "shadow": "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)"
+        },
+        {
+          "slug": "lg",
+          "name": "LG",
+          "shadow": "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)"
+        },
+        {
+          "slug": "xl",
+          "name": "XL",
+          "shadow": "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)"
+        }
+      ]
+    },
+    "spacing": {
+      "customSpacingSize": false,
+      "defaultSpacingSizes": false,
+      "margin": false,
+      "padding": false,
+      "units": [],
+      "spacingSizes": [
+        { "slug": "0", "name": "0", "size": "0" },
+        { "slug": "1", "name": "1", "size": "0.25rem" },
+        { "slug": "2", "name": "2", "size": "0.5rem" },
+        { "slug": "3", "name": "3", "size": "0.75rem" },
+        { "slug": "4", "name": "4", "size": "1rem" },
+        { "slug": "5", "name": "5", "size": "1.25rem" },
+        { "slug": "6", "name": "6", "size": "1.5rem" },
+        { "slug": "8", "name": "8", "size": "2rem" },
+        { "slug": "10", "name": "10", "size": "2.5rem" },
+        { "slug": "12", "name": "12", "size": "3rem" },
+        { "slug": "16", "name": "16", "size": "4rem" },
+        { "slug": "20", "name": "20", "size": "5rem" },
+        { "slug": "24", "name": "24", "size": "6rem" }
+      ]
+    },
+    "typography": {
+      "customFontSize": false,
+      "defaultFontSizes": false,
+      "dropCap": false,
+      "fluid": true,
+      "fontStyle": false,
+      "letterSpacing": false,
+      "lineHeight": false,
+      "textDecoration": false,
+      "textTransform": false,
+      "writingMode": false,
+      "fontFamilies": [
+        {
+          "slug": "sans",
+          "name": "Sans",
+          "fontFamily": "ui-sans-serif, system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif"
+        },
+        {
+          "slug": "serif",
+          "name": "Serif",
+          "fontFamily": "ui-serif, Georgia, Cambria, \"Times New Roman\", serif"
+        },
+        {
+          "slug": "mono",
+          "name": "Mono",
+          "fontFamily": "ui-monospace, SFMono-Regular, Menlo, Consolas, \"Liberation Mono\", monospace"
+        }
+      ],
+      "fontSizes": [
+        {
+          "slug": "xs",
+          "name": "XS",
+          "size": "0.8125rem",
+          "fluid": { "min": "0.75rem", "max": "0.8125rem" }
+        },
+        {
+          "slug": "sm",
+          "name": "SM",
+          "size": "0.9375rem",
+          "fluid": { "min": "0.875rem", "max": "0.9375rem" }
+        },
+        {
+          "slug": "base",
+          "name": "Base",
+          "size": "1.0625rem",
+          "fluid": { "min": "1rem", "max": "1.0625rem" }
+        },
+        {
+          "slug": "lg",
+          "name": "LG",
+          "size": "1.25rem",
+          "fluid": { "min": "1.125rem", "max": "1.25rem" }
+        },
+        {
+          "slug": "xl",
+          "name": "XL",
+          "size": "1.5rem",
+          "fluid": { "min": "1.25rem", "max": "1.5rem" }
+        },
+        {
+          "slug": "2xl",
+          "name": "2XL",
+          "size": "1.875rem",
+          "fluid": { "min": "1.5rem", "max": "1.875rem" }
+        },
+        {
+          "slug": "3xl",
+          "name": "3XL",
+          "size": "2.25rem",
+          "fluid": { "min": "1.875rem", "max": "2.25rem" }
+        },
+        {
+          "slug": "4xl",
+          "name": "4XL",
+          "size": "3rem",
+          "fluid": { "min": "2.25rem", "max": "3rem" }
+        },
+        {
+          "slug": "5xl",
+          "name": "5XL",
+          "size": "3.75rem",
+          "fluid": { "min": "2.75rem", "max": "3.75rem" }
+        }
+      ]
     }
-  }
+  },
+  "styles": {
+    "color": {
+      "background": "var(--wp--preset--color--surface)",
+      "text": "var(--wp--preset--color--on-surface)"
+    },
+    "typography": {
+      "fontFamily": "var(--wp--preset--font-family--sans)",
+      "fontSize": "var(--wp--preset--font-size--base)",
+      "lineHeight": "1.5"
+    },
+    "elements": { "link": { "color": { "text": "var(--wp--preset--color--primary)" } } }
+  },
+  "templateParts": [
+    { "name": "header", "title": "Header", "area": "header" },
+    { "name": "footer", "title": "Footer", "area": "footer" }
+  ]
 }

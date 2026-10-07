@@ -14,7 +14,7 @@ components ──┘                  ├─► JSON Schema for AI    (packages/
 Nothing is defined twice. Adding a component or token means editing the registry only; everything else is generated.
 
 ## 2. Design tokens
-- Format: W3C Design Tokens (DTCG) JSON in `packages/tokens/tokens.json`.
+- Format: W3C Design Tokens (DTCG) JSON in `packages/tokens/src/tokens.json` (inside `src` so it bundles into the package).
 - Categories: `color`, `space`, `fontFamily`, `fontSize` (fluid, clamp), `fontWeight`, `lineHeight`, `radius`, `shadow`, `container` (max widths), `breakpoint`.
 - Token references in the schema are strings: `"space.4"`, `"color.primary"`, `"fontSize.xl"`.
 - Outputs: `theme.json` presets + settings (free values disabled), CSS custom properties `--bb-*`, and the utility class set.

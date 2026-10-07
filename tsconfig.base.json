@@ -14,6 +14,7 @@
     "resolveJsonModule": true,
     "declaration": true,
     "forceConsistentCasingInFileNames": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "customConditions": ["source"]
   }
 }
