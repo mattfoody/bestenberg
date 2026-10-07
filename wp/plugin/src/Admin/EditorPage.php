@@ -49,7 +49,7 @@ final class EditorPage {
 			59
 		);
 
-		$this->hook_suffix = is_string( $hook ) ? $hook : '';
+		$this->hook_suffix = $hook;
 	}
 
 	/**
