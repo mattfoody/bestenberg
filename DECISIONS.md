@@ -6,3 +6,8 @@ Log of non-obvious choices. Newest at the bottom. Format: date — decision — 
 - 2026-10-07 — TS packages build with tsup (ESM + d.ts); a single root Vitest config runs all package tests. — One command for all unit tests; per-package configs add noise.
 - 2026-10-07 — wp-env pins WordPress via the official `wordpress-7.1.zip` URL and WooCommerce via `latest-stable`. — Matches PLAN minimum (7.1); Woo follows stable releases.
 - 2026-10-07 — Local Node is 22 in some environments; `.nvmrc` stays 20 (minimum) and CI tests on 20. — Lowest supported version is what CI must prove.
+- 2026-10-07 — No `pnpm-lock.yaml` / `composer.lock` committed yet; CI installs with `--no-frozen-lockfile`. — M0 was built in a workspace without registry access. Generate and commit both lockfiles on the first local install, then switch CI to `--frozen-lockfile`.
+- 2026-10-07 — TypeScript `~5.9` and ESLint 9 (flat config) rather than TS 6 / ESLint 10. — typescript-eslint support for the newest majors was unverified; upgrade together later.
+- 2026-10-07 — PHPUnit 9.6 + Yoast polyfills, run inside wp-env's tests container. — The WordPress core test library targets PHPUnit 9; polyfills keep tests forward-compatible.
+- 2026-10-07 — Full-screen editor page hides WP admin chrome with a body class + CSS rather than a custom admin template. — Least invasive; keeps admin notices, capabilities and screen handling standard.
+- 2026-10-07 — ESLint `no-restricted-imports` enforces "no `@wordpress/*` in packages/ except adapter-blocks". — Makes PLAN.md §2.6 a build error instead of a convention.

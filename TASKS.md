@@ -16,8 +16,8 @@
 - [x] **0.5 Editor app.** `wp/editor/` built with `@wordpress/scripts` (dependency extraction on). Admin menu "Bestenberg" opens a full-screen page mounting a React root that says "Bestenberg".
 - [x] **0.6 Local env.** `.wp-env.json`: WP 7.1, PHP 8.3, plugin + theme mapped, WooCommerce installed, debug on. `pnpm env:start` / `env:stop` / `env:reset`.
 - [x] **0.7 Quality tools.** ESLint + Prettier (TS/React), PHPCS (WPCS, `bestenberg` prefix rules), PHPStan level 6 with WP stubs, PHPUnit via wp-env, Playwright configured against wp-env.
-- [ ] **0.8 CI (GitHub Actions).** Jobs: lint, typecheck, unit (Vitest), PHP (PHPCS, PHPStan, PHPUnit on PHP 8.1 + 8.3), e2e smoke (plugin + theme + Woo activate; admin page loads with no console errors).
-- [ ] **0.9 CLAUDE.md commands.** Fill in the real commands in CLAUDE.md.
+- [x] **0.8 CI (GitHub Actions).** Jobs: lint, typecheck, unit (Vitest), PHP (PHPCS, PHPStan, PHPUnit on PHP 8.1 + 8.3), e2e smoke (plugin + theme + Woo activate; admin page loads with no console errors).
+- [x] **0.9 CLAUDE.md commands.** Fill in the real commands in CLAUDE.md.
 
 **Done when:** `pnpm i && pnpm env:start && pnpm test:all` passes locally and in CI.
 

@@ -1,0 +1,104 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # No lockfiles committed yet (see DECISIONS.md); switch to --frozen-lockfile once they are.
+  PNPM_INSTALL: pnpm install --no-frozen-lockfile
+
+jobs:
+  js:
+    name: JS (lint, typecheck, unit, build)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - run: ${{ env.PNPM_INSTALL }}
+      - run: pnpm lint:js
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm build
+
+  php:
+    name: PHP ${{ matrix.php }} (PHPCS, PHPStan)
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['8.1', '8.3']
+    defaults:
+      run:
+        working-directory: wp/plugin
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          tools: composer
+          coverage: none
+      - run: composer install --no-interaction --no-progress
+      - run: composer lint
+      - run: composer stan
+
+  wordpress:
+    name: WordPress (PHPUnit PHP ${{ matrix.php }}${{ matrix.e2e && ', e2e' || '' }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - php: '8.1'
+            e2e: false
+          - php: '8.3'
+            e2e: true
+    env:
+      WP_ENV_PHP_VERSION: ${{ matrix.php }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          tools: composer
+          coverage: none
+      - run: ${{ env.PNPM_INSTALL }}
+      - run: composer --working-dir=wp/plugin install --no-interaction --no-progress
+      - run: pnpm build
+      - name: Start wp-env
+        run: pnpm exec wp-env start
+      - name: Verify plugin, theme and WooCommerce are active
+        run: |
+          pnpm exec wp-env run cli wp plugin is-active bestenberg
+          pnpm exec wp-env run cli wp plugin is-active woocommerce
+          test "$(pnpm exec wp-env run cli wp theme list --status=active --field=name 2>/dev/null | tail -1)" = "bestenberg"
+      - name: PHPUnit
+        run: pnpm test:php
+      - name: Install Playwright browser
+        if: matrix.e2e
+        run: pnpm exec playwright install --with-deps chromium
+      - name: E2E smoke
+        if: matrix.e2e
+        run: pnpm test:e2e
+      - uses: actions/upload-artifact@v4
+        if: failure() && matrix.e2e
+        with:
+          name: playwright-report
+          path: playwright-report
+          retention-days: 7

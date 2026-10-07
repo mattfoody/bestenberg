@@ -18,4 +18,21 @@ AI-native visual editor on Gutenberg, by Matt Foody (https://mattfoody.com).
 - Escape all output in PHP; sanitize rich text on both sides.
 
 ## Commands
-_(fill in during task 0.9)_
+Requirements: Node 20+, pnpm 10, PHP 8.1+, Composer, Docker.
+
+| Task | Command |
+|---|---|
+| Install | `pnpm install && composer --working-dir=wp/plugin install` |
+| Build packages + editor | `pnpm build` |
+| Editor watch mode | `pnpm --filter @bestenberg/editor start` |
+| Start WordPress (http://localhost:8888, admin/password) | `pnpm env:start` |
+| Stop / reset WordPress | `pnpm env:stop` / `pnpm env:reset` |
+| Unit tests (Vitest) | `pnpm test` |
+| PHP tests (PHPUnit in wp-env) | `pnpm test:php` |
+| E2E (Playwright, needs wp-env) | `pnpm test:e2e` (first time: `pnpm exec playwright install chromium`) |
+| Lint JS / PHP | `pnpm lint:js` / `pnpm lint:php` |
+| Static analysis | `pnpm stan` |
+| Typecheck | `pnpm typecheck` |
+| Everything | `pnpm test:all` |
+
+CI: `.github/workflows/ci.yml` runs JS, PHP (8.1 + 8.3) and WordPress (PHPUnit + e2e) jobs on every push and PR.
