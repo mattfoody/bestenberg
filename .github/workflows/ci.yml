@@ -22,16 +22,16 @@ jobs:
     name: JS (lint, typecheck, unit, build)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version-file: .nvmrc
       - run: ${{ env.PNPM_INSTALL }}
-      - run: pnpm lint:js
-      - run: pnpm typecheck
-      - run: pnpm test
-      - run: pnpm build
+      - run: "$GITHUB_WORKSPACE/bin/ci-run.sh" 'ESLint/Prettier' pnpm lint:js
+      - run: "$GITHUB_WORKSPACE/bin/ci-run.sh" 'Typecheck' pnpm typecheck
+      - run: "$GITHUB_WORKSPACE/bin/ci-run.sh" 'Vitest' pnpm test
+      - run: "$GITHUB_WORKSPACE/bin/ci-run.sh" 'Build' pnpm build
 
   php:
     name: PHP ${{ matrix.php }} (PHPCS, PHPStan)
@@ -44,15 +44,15 @@ jobs:
       run:
         working-directory: wp/plugin
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
           tools: composer
           coverage: none
-      - run: composer install --no-interaction --no-progress
-      - run: composer lint
-      - run: composer stan
+      - run: "$GITHUB_WORKSPACE/bin/ci-run.sh" 'Composer install' composer install --no-interaction --no-progress
+      - run: "$GITHUB_WORKSPACE/bin/ci-run.sh" 'PHPCS' composer lint
+      - run: "$GITHUB_WORKSPACE/bin/ci-run.sh" 'PHPStan' composer stan
 
   wordpress:
     name: WordPress (PHPUnit PHP ${{ matrix.php }}${{ matrix.e2e && ', e2e' || '' }})
@@ -68,9 +68,9 @@ jobs:
     env:
       WP_ENV_PHP_VERSION: ${{ matrix.php }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version-file: .nvmrc
       - uses: shivammathur/setup-php@v2
@@ -80,22 +80,22 @@ jobs:
           coverage: none
       - run: ${{ env.PNPM_INSTALL }}
       - run: composer --working-dir=wp/plugin install --no-interaction --no-progress
-      - run: pnpm build
+      - run: "$GITHUB_WORKSPACE/bin/ci-run.sh" 'Build' pnpm build
       - name: Start wp-env
-        run: pnpm exec wp-env start
+        run: "$GITHUB_WORKSPACE/bin/ci-run.sh" 'wp-env start' pnpm exec wp-env start
       - name: Verify plugin, theme and WooCommerce are active
         run: |
           pnpm exec wp-env run cli wp plugin is-active bestenberg
           pnpm exec wp-env run cli wp plugin is-active woocommerce
           test "$(pnpm exec wp-env run cli wp theme list --status=active --field=name 2>/dev/null | tail -1)" = "bestenberg"
       - name: PHPUnit
-        run: pnpm test:php
+        run: "$GITHUB_WORKSPACE/bin/ci-run.sh" 'PHPUnit' pnpm test:php
       - name: Install Playwright browser
         if: matrix.e2e
         run: pnpm exec playwright install --with-deps chromium
       - name: E2E smoke
         if: matrix.e2e
-        run: pnpm test:e2e
+        run: "$GITHUB_WORKSPACE/bin/ci-run.sh" 'Playwright' pnpm test:e2e
       - uses: actions/upload-artifact@v4
         if: failure() && matrix.e2e
         with:
