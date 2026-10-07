@@ -6,8 +6,8 @@
   "license": "GPL-2.0-or-later",
   "author": "Matt Foody (https://mattfoody.com)",
   "scripts": {
-    "build": "wp-scripts build src/index.tsx --output-path=../plugin/build/editor",
-    "start": "wp-scripts start src/index.tsx --output-path=../plugin/build/editor",
+    "build": "wp-scripts build",
+    "start": "wp-scripts start",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

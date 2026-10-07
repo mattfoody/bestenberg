@@ -21,6 +21,11 @@ export default tseslint.config(
     },
   },
   {
+    files: ['**/*.config.js'],
+    languageOptions: { sourceType: 'commonjs' },
+    rules: { '@typescript-eslint/no-require-imports': 'off' },
+  },
+  {
     files: ['wp/editor/**/*.{ts,tsx}'],
     languageOptions: {
       globals: { ...globals.browser },

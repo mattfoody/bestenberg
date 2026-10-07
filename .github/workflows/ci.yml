@@ -33,6 +33,10 @@ jobs:
       - run: bin/ci-run.sh 'Typecheck' pnpm typecheck
       - run: bin/ci-run.sh 'Vitest' pnpm test
       - run: bin/ci-run.sh 'Build' pnpm build
+      - name: Verify editor build output
+        run: |
+          echo "::notice title=Editor build::$(ls wp/plugin/build/editor 2>&1 | tr '\n' ' ')"
+          test -f wp/plugin/build/editor/index.js && test -f wp/plugin/build/editor/index.asset.php
 
   php:
     name: PHP ${{ matrix.php }} (PHPCS, PHPStan)
@@ -83,6 +87,10 @@ jobs:
       - run: ${{ env.PNPM_INSTALL }}
       - run: composer --working-dir=wp/plugin install --no-interaction --no-progress
       - run: bin/ci-run.sh 'Build' pnpm build
+      - name: Verify editor build output
+        run: |
+          echo "::notice title=Editor build::$(ls wp/plugin/build/editor 2>&1 | tr '\n' ' ')"
+          test -f wp/plugin/build/editor/index.js && test -f wp/plugin/build/editor/index.asset.php
       - name: Start wp-env
         run: bin/ci-run.sh 'wp-env start' pnpm exec wp-env start
       - name: Verify plugin, theme and WooCommerce are active
