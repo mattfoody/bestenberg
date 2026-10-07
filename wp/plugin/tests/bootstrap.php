@@ -17,7 +17,7 @@ if ( ! is_readable( $bestenberg_tests_dir . '/includes/functions.php' ) ) {
 	exit( 1 );
 }
 
-define( 'WP_TESTS_PHPUNIT_POLYFILLS_PATH', dirname( __DIR__ ) . '/vendor/yoast/phpunit-polyfills' );
+define( 'WP_TESTS_PHPUNIT_POLYFILLS_PATH', dirname( __DIR__ ) . '/vendor/yoast/phpunit-polyfills' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound -- Required by the WP test library.
 
 require_once dirname( __DIR__ ) . '/vendor/autoload.php';
 require_once $bestenberg_tests_dir . '/includes/functions.php';

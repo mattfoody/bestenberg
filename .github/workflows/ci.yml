@@ -27,6 +27,7 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version-file: .nvmrc
+          package-manager-cache: false
       - run: ${{ env.PNPM_INSTALL }}
       - run: bin/ci-run.sh 'ESLint/Prettier' pnpm lint:js
       - run: bin/ci-run.sh 'Typecheck' pnpm typecheck
@@ -73,6 +74,7 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version-file: .nvmrc
+          package-manager-cache: false
       - uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
