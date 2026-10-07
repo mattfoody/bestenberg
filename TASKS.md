@@ -38,10 +38,10 @@
 - [x] **1.5 Utility generator** (SCHEMA §6): `utilities.map.json` + `utilities.css`. Tests: Tailwind-style names with `bb:` prefix, mobile-first media query order, only token values, every style key covered. Print a size report.
 - [x] **1.6 Schema package.** Types + zod for `Doc`, `Node`, `Style`, `Responsive`, `Binding` (SCHEMA §3); nanoid ids; uniqueness and nesting validation; JSON Schema export. Tests incl. invalid docs.
 - [x] **1.7 Registry skeleton.** `ComponentDef`, `ControlDef`, `defineComponent`, `getComponent`, `listComponents`; shared control presets (spacing, typography, color, layout, visibility); `styleToClasses(style)` in TS. Register: `section`, `container`, `stack`, `row`, `grid`, `heading`, `text`, `button`, `image` (definitions only; `toBlock`/`fromBlock` come in M2).
-- [ ] **1.8 PHP style runtime.** `Bestenberg\Styles\Utilities` (loads map), `Collector` (records used classes during render), output of used rules only.
+- [x] **1.8 PHP style runtime.** `Bestenberg\Styles\Utilities` (loads map), `Collector` (records used classes during render), output of used rules only.
   - Block themes render the template before `wp_head`, so collection should finish in time. Verify; fall back to output buffering if needed and log it in DECISIONS.md.
   - Cache the per-page CSS by hash.
-- [ ] **1.9 Base theme.** Templates: `index`, `page`, `single`, `archive`, `404`; parts: `header`, `footer`. wp-env setup script creates a demo page.
+- [x] **1.9 Base theme.** Templates: `index`, `page`, `single`, `archive`, `404`; parts: `header`, `footer`. wp-env setup script creates a demo page.
 
 **Done when:** the demo page renders with token styles, and page source contains only the utility rules that page uses.
 

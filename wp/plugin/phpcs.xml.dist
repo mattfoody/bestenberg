@@ -40,6 +40,11 @@
 		</properties>
 	</rule>
 
+	<!-- Tests: reading fixture files directly is fine. -->
+	<rule ref="WordPress.WP.AlternativeFunctions">
+		<exclude-pattern>/tests/*</exclude-pattern>
+	</rule>
+
 	<!-- Tests: relax documentation rules. -->
 	<rule ref="Squiz.Commenting">
 		<exclude-pattern>/tests/*</exclude-pattern>
