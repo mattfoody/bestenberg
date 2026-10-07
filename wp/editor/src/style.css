@@ -1,0 +1,44 @@
+/* Full-screen mode: hide WP admin chrome on the Bestenberg page only. */
+body.bestenberg-fullscreen #adminmenumain,
+body.bestenberg-fullscreen #wpadminbar,
+body.bestenberg-fullscreen #wpfooter {
+  display: none;
+}
+
+body.bestenberg-fullscreen #wpcontent,
+body.bestenberg-fullscreen #wpbody-content {
+  margin: 0;
+  padding: 0;
+}
+
+html.wp-toolbar:has(body.bestenberg-fullscreen) {
+  padding-top: 0;
+}
+
+.bestenberg-app {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  grid-template-rows: 56px 1fr;
+  background: #f4f4f5;
+  color: #18181b;
+  font-family:
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    sans-serif;
+}
+
+.bestenberg-app__bar {
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  background: #fff;
+  border-bottom: 1px solid #e4e4e7;
+}
+
+.bestenberg-app__title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}

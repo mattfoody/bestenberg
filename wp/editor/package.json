@@ -1,0 +1,20 @@
+{
+  "name": "@bestenberg/editor",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Bestenberg full-screen editor app (built into wp/plugin/build/editor).",
+  "license": "GPL-2.0-or-later",
+  "author": "Matt Foody (https://mattfoody.com)",
+  "scripts": {
+    "build": "wp-scripts build src/index.tsx --output-path=../plugin/build/editor",
+    "start": "wp-scripts start src/index.tsx --output-path=../plugin/build/editor",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@wordpress/element": "^6.20.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.0",
+    "@wordpress/scripts": "^30.20.0"
+  }
+}

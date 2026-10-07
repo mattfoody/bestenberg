@@ -8,12 +8,12 @@
 
 - [x] **0.1 Monorepo.** pnpm workspaces, root `package.json`, `tsconfig.base.json` (strict), `.nvmrc` (20), `.editorconfig`, `LICENSE` (GPL-2.0-or-later), `README.md`, `DECISIONS.md`, `CHANGELOG.md`.
 - [x] **0.2 Packages.** Scaffold `packages/{schema,tokens,ai,adapter-blocks}` as `@bestenberg/*`: `src/index.ts`, build (tsup), Vitest, one passing test each.
-- [ ] **0.3 Plugin.** `wp/plugin/bestenberg.php` header:
+- [x] **0.3 Plugin.** `wp/plugin/bestenberg.php` header:
   - Plugin Name: Bestenberg · Author: Matt Foody · Author URI: https://mattfoody.com
   - Requires at least: 7.1 · Requires PHP: 8.1 · License: GPL-2.0-or-later · Text Domain: bestenberg
   - Composer PSR-4 `Bestenberg\` → `src/`; `Plugin` bootstrap class; no logic yet.
-- [ ] **0.4 Theme.** `wp/theme/` minimal block theme: `style.css` header (same author), placeholder `theme.json`, `templates/index.html`.
-- [ ] **0.5 Editor app.** `wp/editor/` built with `@wordpress/scripts` (dependency extraction on). Admin menu "Bestenberg" opens a full-screen page mounting a React root that says "Bestenberg".
+- [x] **0.4 Theme.** `wp/theme/` minimal block theme: `style.css` header (same author), placeholder `theme.json`, `templates/index.html`.
+- [x] **0.5 Editor app.** `wp/editor/` built with `@wordpress/scripts` (dependency extraction on). Admin menu "Bestenberg" opens a full-screen page mounting a React root that says "Bestenberg".
 - [ ] **0.6 Local env.** `.wp-env.json`: WP 7.1, PHP 8.3, plugin + theme mapped, WooCommerce installed, debug on. `pnpm env:start` / `env:stop` / `env:reset`.
 - [ ] **0.7 Quality tools.** ESLint + Prettier (TS/React), PHPCS (WPCS, `bestenberg` prefix rules), PHPStan level 6 with WP stubs, PHPUnit via wp-env, Playwright configured against wp-env.
 - [ ] **0.8 CI (GitHub Actions).** Jobs: lint, typecheck, unit (Vitest), PHP (PHPCS, PHPStan, PHPUnit on PHP 8.1 + 8.3), e2e smoke (plugin + theme + Woo activate; admin page loads with no console errors).
