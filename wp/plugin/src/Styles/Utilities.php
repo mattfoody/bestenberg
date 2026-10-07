@@ -92,9 +92,9 @@ final class Utilities {
 	 * CSS for the given classes only, in cascade order, grouped by media query.
 	 * Unknown classes are ignored.
 	 *
-	 * @param iterable<string> $classes Class names.
+	 * @param string[] $classes Class names.
 	 */
-	public function css_for( iterable $classes ): string {
+	public function css_for( array $classes ): string {
 		$used = array();
 		foreach ( $classes as $class_name ) {
 			if ( isset( $this->rules[ $class_name ] ) ) {

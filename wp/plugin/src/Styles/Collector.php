@@ -41,9 +41,9 @@ final class Collector {
 	/**
 	 * Records classes. Only known utilities are kept.
 	 *
-	 * @param iterable<string> $classes Class names.
+	 * @param string[] $classes Class names.
 	 */
-	public function record( iterable $classes ): void {
+	public function record( array $classes ): void {
 		foreach ( $classes as $class_name ) {
 			if ( $this->utilities->has( $class_name ) ) {
 				$this->classes[ $class_name ] = true;
@@ -60,7 +60,8 @@ final class Collector {
 		if ( ! str_contains( $class_attribute, self::PREFIX ) ) {
 			return;
 		}
-		$this->record( preg_split( '/\s+/', trim( $class_attribute ) ) ?: array() );
+		$classes = preg_split( '/\s+/', trim( $class_attribute ) );
+		$this->record( false === $classes ? array() : $classes );
 	}
 
 	/**

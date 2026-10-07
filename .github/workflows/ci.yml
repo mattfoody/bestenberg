@@ -27,7 +27,7 @@ jobs:
         with:
           node-version-file: .nvmrc
       - run: ${{ env.PNPM_INSTALL }}
-      - run: bin/ci-run.sh 'ESLint/Prettier' pnpm lint:js
+      - run: bin/ci-run.sh 'ESLint/Prettier' bash -c 'pnpm lint:js || { pnpm exec prettier --write . >/dev/null; git --no-pager diff; exit 1; }'
       - run: bin/ci-run.sh 'Typecheck' pnpm typecheck
       - run: bin/ci-run.sh 'Vitest' pnpm test
       - run: bin/ci-run.sh 'Build' pnpm build
