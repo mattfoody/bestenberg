@@ -67,6 +67,7 @@ export const StyleSchema = z.strictObject({
   padding: z.strictObject({ x: SpaceRef.optional(), y: SpaceRef.optional() }).optional(),
   margin: z.strictObject({ top: SpaceRef.optional(), bottom: SpaceRef.optional() }).optional(),
   width: z.union([z.enum(['auto', 'full']), ContainerRef]).optional(),
+  height: SpaceRef.optional(),
   background: z
     .union([ColorRef, z.strictObject({ image: MediaRefSchema, overlay: ColorRef.optional() })])
     .optional(),

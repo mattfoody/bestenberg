@@ -75,6 +75,7 @@ export const utility = {
   wAuto: 'w-auto',
   wFull: 'w-full',
   container: (name: string) => `container-${name}`,
+  h: (space: string) => `h-${space}`,
   bg: (color: string) => `bg-${color}`,
   bgCover: 'bg-cover',
   overlay: (color: string) => `overlay-${color}`,
@@ -155,6 +156,7 @@ function catalogue(tokens: Tokens): Array<[string, Rule]> {
       decl(`width:100%;max-width:${cssVar('container', c)};margin-inline:auto`),
     );
   }
+  for (const s of space) add(utility.h(s), decl(`height:${cssVar('space', s)}`));
 
   // Spacing.
   for (const s of space) add(utility.px(s), decl(`padding-inline:${cssVar('space', s)}`));
@@ -222,6 +224,13 @@ export interface UtilityMap {
   prefix: typeof UTILITY_PREFIX;
   /** Media queries for each non-empty media key. */
   media: Record<Exclude<MediaKey, ''>, string>;
+  /** Names that are not derived from a value (for runtimes that build class names, e.g. PHP). */
+  aliases: {
+    /** Aspect value → utility base name. */
+    aspects: Record<Aspect, string>;
+    /** Breakpoint → full visibility class name. */
+    hidden: Record<keyof typeof HIDDEN_CLASSES, string>;
+  };
   rules: Record<string, UtilityRuleEntry>;
 }
 
@@ -256,7 +265,18 @@ export function buildUtilityMap(tokens: Tokens): UtilityMap {
     rules[name] = [order++, key, `.${escapeClassName(name)}{display:none!important}`];
   }
 
-  return { version: 1, prefix: UTILITY_PREFIX, media, rules };
+  const aliases: UtilityMap['aliases'] = {
+    aspects: Object.fromEntries(
+      (Object.keys(ASPECTS) as Aspect[]).map((aspect) => [aspect, ASPECTS[aspect].name]),
+    ) as Record<Aspect, string>,
+    hidden: {
+      base: HIDDEN_CLASSES.base.className,
+      tablet: HIDDEN_CLASSES.tablet.className,
+      desktop: HIDDEN_CLASSES.desktop.className,
+    },
+  };
+
+  return { version: 1, prefix: UTILITY_PREFIX, media, aliases, rules };
 }
 
 /**

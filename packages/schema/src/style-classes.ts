@@ -1,5 +1,6 @@
 import { className, HIDDEN_CLASSES, utility, type Variant } from '@bestenberg/tokens';
 import type { Node } from './document';
+import type { ComponentDef } from './registry/types';
 import { tokenName, type Breakpoint, type ResponsiveStyle, type Style } from './style';
 
 const VARIANT: Record<Breakpoint, Variant | undefined> = {
@@ -34,6 +35,7 @@ export function styleClasses(style: Style, variant?: Variant): string[] {
   if (style.width === 'auto') add(utility.wAuto);
   else if (style.width === 'full') add(utility.wFull);
   else if (style.width) add(utility.container(tokenName(style.width)));
+  if (style.height) add(utility.h(tokenName(style.height)));
 
   if (style.padding?.x) add(utility.px(tokenName(style.padding.x)));
   if (style.padding?.y) add(utility.py(tokenName(style.padding.y)));
@@ -87,4 +89,15 @@ export function visibilityClasses(hidden?: Node['hidden']): string[] {
 /** Every utility class a node needs (deduplicated, stable order). */
 export function nodeClasses(node: Pick<Node, 'style' | 'hidden'>): string[] {
   return [...new Set([...styleToClasses(node.style), ...visibilityClasses(node.hidden)])];
+}
+
+/**
+ * All classes for a component Bestenberg renders itself: element base classes,
+ * then utilities. Mirrors Bestenberg\Blocks\LayoutBlocks in PHP.
+ */
+export function componentClasses(
+  def: Pick<ComponentDef, 'element'>,
+  node: Pick<Node, 'style' | 'hidden'>,
+): string[] {
+  return [...new Set([...(def.element?.classes ?? []), ...nodeClasses(node)])];
 }

@@ -3,6 +3,9 @@ import { DocSchema, walk, type Doc, type Node } from './document';
 import type { Registry } from './registry/registry';
 import { BREAKPOINTS } from './style';
 
+/** Type of nodes that preserve unsupported blocks verbatim. */
+export const RAW_TYPE = 'raw';
+
 export interface ValidationIssue {
   /** Location in the document, e.g. `root[0].children[1].style.base.padding.y`. */
   path: string;
@@ -72,7 +75,8 @@ function checkNode(
     issues.push({ path: `${path}.children`, message: `${def.type} cannot have children` });
   } else if (Array.isArray(def.allowedChildren)) {
     children.forEach((child, index) => {
-      if (!def.allowedChildren.includes(child.type)) {
+      // Raw (unsupported) blocks are preserved wherever they were found.
+      if (child.type !== RAW_TYPE && !def.allowedChildren.includes(child.type)) {
         issues.push({
           path: `${path}.children[${index}]`,
           message: `${child.type} is not allowed inside ${def.type}`,

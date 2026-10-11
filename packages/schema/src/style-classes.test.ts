@@ -1,66 +1,17 @@
-import {
-  ALIGN,
-  ASPECTS,
-  BORDER_WIDTHS,
-  buildUtilityMap,
-  COLOR_NAMES,
-  CONTAINER_NAMES,
-  FONT_FAMILY_NAMES,
-  FONT_SIZE_NAMES,
-  FONT_WEIGHT_NAMES,
-  GRID_COLUMNS,
-  HIDDEN_CLASSES,
-  JUSTIFY,
-  LINE_HEIGHT_NAMES,
-  RADIUS_NAMES,
-  SHADOW_NAMES,
-  SPACE_NAMES,
-  TEXT_ALIGN,
-  tokens,
-} from '@bestenberg/tokens';
+import { buildUtilityMap, HIDDEN_CLASSES, tokens } from '@bestenberg/tokens';
 import { describe, expect, it } from 'vitest';
 import {
+  componentClasses,
+  defaultRegistry,
   nodeClasses,
+  sampleStyles,
   STYLE_KEYS,
-  StyleSchema,
   styleToClasses,
   visibilityClasses,
-  type Style,
 } from './index';
 
 const map = buildUtilityMap(tokens);
-const ref = (category: string, names: readonly string[]) => names.map((n) => `${category}.${n}`);
-
-/** One single-property style per possible value of every style field. */
-function everyStyleValue(): Style[] {
-  const colors = ref('color', COLOR_NAMES);
-  const space = ref('space', SPACE_NAMES);
-  const raw: unknown[] = [
-    ...['stack', 'row', 'grid'].map((display) => ({ layout: { display } })),
-    ...GRID_COLUMNS.map((columns) => ({ layout: { columns } })),
-    ...space.map((gap) => ({ layout: { gap } })),
-    ...Object.keys(ALIGN).map((align) => ({ layout: { align } })),
-    ...Object.keys(JUSTIFY).map((justify) => ({ layout: { justify } })),
-    ...[true, false].map((wrap) => ({ layout: { wrap } })),
-    ...space.flatMap((s) => [{ padding: { x: s } }, { padding: { y: s } }]),
-    ...space.flatMap((s) => [{ margin: { top: s } }, { margin: { bottom: s } }]),
-    ...['auto', 'full', ...ref('container', CONTAINER_NAMES)].map((width) => ({ width })),
-    ...colors.map((background) => ({ background })),
-    ...colors.map((overlay) => ({ background: { image: { url: '/a.jpg' }, overlay } })),
-    ...colors.map((color) => ({ color })),
-    ...ref('fontFamily', FONT_FAMILY_NAMES).map((family) => ({ font: { family } })),
-    ...ref('fontSize', FONT_SIZE_NAMES).map((size) => ({ font: { size } })),
-    ...ref('fontWeight', FONT_WEIGHT_NAMES).map((weight) => ({ font: { weight } })),
-    ...ref('lineHeight', LINE_HEIGHT_NAMES).map((lineHeight) => ({ font: { lineHeight } })),
-    ...TEXT_ALIGN.map((align) => ({ font: { align } })),
-    ...ref('radius', RADIUS_NAMES).map((radius) => ({ radius })),
-    ...ref('shadow', SHADOW_NAMES).map((shadow) => ({ shadow })),
-    ...BORDER_WIDTHS.map((width) => ({ border: { width } })),
-    ...colors.map((color) => ({ border: { color } })),
-    ...Object.keys(ASPECTS).map((aspect) => ({ aspect })),
-  ];
-  return raw.map((style) => StyleSchema.parse(style));
-}
+const everyStyleValue = sampleStyles;
 
 describe('styleToClasses', () => {
   it('maps a responsive style mobile-first', () => {
@@ -176,5 +127,32 @@ describe('visibility', () => {
         hidden: { tablet: true },
       }),
     ).toEqual(['bb:py-4', 'bb:md:py-4', 'bb:md:max-lg:hidden']);
+  });
+});
+
+describe('componentClasses', () => {
+  it('puts element classes first and removes duplicates', () => {
+    expect(
+      componentClasses(defaultRegistry.get('stack')!, {
+        style: { base: { layout: { display: 'stack', gap: 'space.4' } } },
+        hidden: { desktop: true },
+      }),
+    ).toEqual(['bb-stack', 'bb:flex', 'bb:flex-col', 'bb:gap-4', 'bb:lg:hidden']);
+  });
+
+  it('uses only utilities that exist for element classes', () => {
+    for (const def of defaultRegistry.list()) {
+      for (const name of def.element?.classes ?? []) {
+        if (name.startsWith('bb:')) expect(map.rules[name] !== undefined, name).toBe(true);
+      }
+    }
+  });
+
+  it('maps height for spacers', () => {
+    expect(
+      componentClasses(defaultRegistry.get('spacer')!, {
+        style: { base: { height: 'space.8' }, desktop: { height: 'space.16' } },
+      }),
+    ).toEqual(['bb-spacer', 'bb:h-8', 'bb:lg:h-16']);
   });
 });

@@ -53,29 +53,37 @@ export interface ControlDef {
 
 export type ComponentCategory = 'layout' | 'content' | 'media' | 'commerce' | 'navigation' | 'data';
 
-/** WP-agnostic block shape (matches @wordpress/blocks BlockInstance structurally). */
-export interface BlockInstance {
-  name: string;
-  attributes: Record<string, unknown>;
-  innerBlocks: BlockInstance[];
+/** How a component renders as an HTML element (components Bestenberg renders itself). */
+export interface ElementDef {
+  /** Default tag. */
+  tag: string;
+  /** Tags `props.tag` may choose from (defaults to just `tag`). */
+  tags?: readonly string[];
+  /** Classes always present, before utility classes. */
+  classes: readonly string[];
+  /** Fixed extra attributes, e.g. `aria-hidden`. */
+  attributes?: Readonly<Record<string, string>>;
 }
 
-/** Registry entry for one component (SCHEMA.md §4). */
+/**
+ * Registry entry for one component (SCHEMA.md §4). WP-agnostic: conversion
+ * to and from blocks lives in @bestenberg/adapter-blocks, keyed by `type`.
+ */
 export interface ComponentDef {
   type: string;
   label: string;
   icon: string;
   category: ComponentCategory;
-  /** Block that stores and renders it: `bestenberg/section`, `core/heading`, … */
+  /** Block that stores it: `bestenberg/section`, `core/heading`, … (`*` for raw). */
   block: string;
   props: z.ZodObject;
   styles: readonly StyleKey[];
   allowedChildren: readonly string[] | 'any' | 'none';
   allowedParents?: readonly string[];
   controls: readonly ControlDef[];
+  /** Present for components rendered by Bestenberg (not core/Woo blocks). */
+  element?: ElementDef;
+  /** Internal components (raw) are never offered to users or the AI. */
+  internal?: boolean;
   ai?: { description: string; examples?: Node[] };
-  /** Schema → block (implemented in M2). */
-  toBlock?: (node: Node) => BlockInstance;
-  /** Block → schema (implemented in M2). */
-  fromBlock?: (block: BlockInstance) => Node;
 }

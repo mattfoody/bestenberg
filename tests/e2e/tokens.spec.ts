@@ -49,7 +49,7 @@ test.describe('M1: token styles on the demo page', () => {
     ]) {
       expect(css, unused).not.toContain(unused);
     }
-    // 552 utilities exist; a page should carry a small fraction of them.
+    // 591 utilities exist; a page should carry a small fraction of them.
     expect(css.split('{').length).toBeLessThan(80);
   });
 });

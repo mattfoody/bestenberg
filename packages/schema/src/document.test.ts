@@ -36,10 +36,17 @@ function sampleDoc(): Doc {
               { id: 'head0001', type: 'heading', props: { text: 'Hello', level: 1 } },
               { id: 'text0001', type: 'text', props: { text: 'Welcome <strong>in</strong>.' } },
               {
-                id: 'btn00001',
-                type: 'button',
-                props: { text: 'Start', href: '/start', variant: 'primary' },
-                hidden: { base: true },
+                id: 'btns0001',
+                type: 'button-group',
+                props: {},
+                children: [
+                  {
+                    id: 'btn00001',
+                    type: 'button',
+                    props: { text: 'Start', href: '/start', variant: 'primary' },
+                    hidden: { base: true },
+                  },
+                ],
               },
             ],
           },
@@ -105,6 +112,39 @@ describe('validateDoc', () => {
     ]);
   });
 
+  it('enforces allowed parents', () => {
+    const doc = sampleDoc();
+    const grid = doc.root[0]!.children![0]!;
+    grid.children!.push({ id: 'loose001', type: 'button', props: { text: 'Loose' } });
+    expect(issues(doc)).toEqual([
+      { path: 'root[0].children[0].children[3]', message: 'button must be inside button-group' },
+    ]);
+  });
+
+  it('accepts raw nodes anywhere, even where children are restricted', () => {
+    const doc = sampleDoc();
+    const group = doc.root[0]!.children![0]!.children![2]!;
+    group.children!.push({
+      id: 'raw00001',
+      type: 'raw',
+      props: { name: 'core/cover', markup: '<!-- wp:cover /-->' },
+    });
+    expect(issues(doc)).toEqual([]);
+  });
+
+  it('rejects unsafe rich text and URLs in props', () => {
+    const doc = sampleDoc();
+    const [heading, text, group] = doc.root[0]!.children![0]!.children!;
+    heading!.props = { text: 'Hi <script>x</script>', level: 1 };
+    text!.props = { text: 'Tom & Jerry' };
+    group!.children![0]!.props = { text: 'Go', href: 'javascript:alert(1)' };
+    expect(issues(doc).map((i) => i.path)).toEqual([
+      'root[0].children[0].children[0].props.text',
+      'root[0].children[0].children[1].props.text',
+      'root[0].children[0].children[2].children[0].props.href',
+    ]);
+  });
+
   it('skips registry checks when no registry is given', () => {
     const doc = sampleDoc();
     doc.root.push({ id: 'mystery1', type: 'carousel' });
@@ -142,7 +182,8 @@ describe('ids and paths', () => {
       'root[0].children[0]:grid<section',
       'root[0].children[0].children[0]:heading<grid',
       'root[0].children[0].children[1]:text<grid',
-      'root[0].children[0].children[2]:button<grid',
+      'root[0].children[0].children[2]:button-group<grid',
+      'root[0].children[0].children[2].children[0]:button<button-group',
     ]);
   });
 });

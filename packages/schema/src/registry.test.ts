@@ -34,18 +34,57 @@ function pathProblem(def: ComponentDef, control: ControlDef): string | undefined
 }
 
 describe('default registry', () => {
-  it('registers the M1 components', () => {
+  it('registers the v1 components', () => {
     expect(defaultRegistry.list().map((c) => c.type)).toEqual([
       'section',
       'container',
       'stack',
       'row',
       'grid',
+      'card',
+      'spacer',
       'heading',
       'text',
+      'list',
+      'list-item',
+      'button-group',
       'button',
       'image',
+      'divider',
+      'quote',
+      'raw',
     ]);
+  });
+
+  it('describes an element for every block Bestenberg renders itself', () => {
+    for (const def of defaultRegistry.list()) {
+      const own = def.block.startsWith('bestenberg/');
+      expect(def.element !== undefined, def.type).toBe(own);
+      if (def.element?.tags)
+        expect(def.element.tags.includes(def.element.tag), def.type).toBe(true);
+    }
+  });
+
+  it('keeps parent and child rules consistent', () => {
+    for (const def of defaultRegistry.list()) {
+      for (const parent of def.allowedParents ?? []) {
+        const allowed = defaultRegistry.get(parent)!.allowedChildren;
+        expect(
+          allowed === 'any' || (Array.isArray(allowed) && allowed.includes(def.type)),
+          def.type,
+        ).toBe(true);
+      }
+    }
+  });
+
+  it('marks raw as internal', () => {
+    expect(defaultRegistry.get('raw')!.internal).toBe(true);
+    expect(
+      defaultRegistry
+        .list()
+        .filter((c) => c.internal)
+        .map((c) => c.type),
+    ).toEqual(['raw']);
   });
 
   it('maps components to blocks both ways', () => {
