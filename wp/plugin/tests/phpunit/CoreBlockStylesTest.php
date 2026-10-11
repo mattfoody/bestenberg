@@ -47,7 +47,7 @@ final class CoreBlockStylesTest extends WP_UnitTestCase {
 	}
 
 	public function test_image_classes_go_on_the_img(): void {
-		$html = do_blocks(
+		$html  = do_blocks(
 			'<!-- wp:image {"bestenberg":{"id":"i","style":{"base":{"radius":"radius.full","aspect":"1/1"}}}} -->'
 			. '<figure class="wp-block-image"><img src="/a.png" alt=""/></figure><!-- /wp:image -->'
 		);

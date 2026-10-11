@@ -49,6 +49,7 @@ type Style = {
   padding?: { x?: SpaceToken; y?: SpaceToken };
   margin?:  { top?: SpaceToken; bottom?: SpaceToken };      // vertical only
   width?: "auto" | "full" | ContainerToken;
+  height?: SpaceToken;                                       // spacers
   background?: ColorToken | { image: MediaRef; overlay?: ColorToken };
   color?: ColorToken;
   font?: { family?: FontFamilyToken; size?: FontSizeToken; weight?: FontWeightToken;
@@ -64,7 +65,8 @@ type Binding =
   | { source: "woo/context"; kind: "cart"|"checkout"|"account"|"order" };
 ```
 Rules:
-- Rich text in `props.text`: limited inline HTML (`strong`, `em`, `a`, `br`, `span.bb-*`), sanitized on both sides.
+- Rich text props (`text`, `citation`) are HTML fragments limited to `strong`, `em`, `a` (href/target/rel), `br` and `span.bb-*`, in canonical form (`sanitizeRichText(x) === x`, so `&` is written `&amp;`). Validation rejects anything else; the adapter sanitizes in both directions; PHP has `Bestenberg\Content\RichText`.
+- URL props allow http(s), mailto, tel and relative URLs only (`isSafeUrl`).
 - Nesting is validated per component (`allowedChildren`, `allowedParents`).
 - No raw CSS, no raw HTML node, no free numeric styles anywhere in the schema.
 
@@ -80,16 +82,19 @@ type ComponentDef = {
   allowedChildren?: ComponentType[] | "any" | "none";
   allowedParents?: ComponentType[];
   controls: ControlDef[];             // editor UI (see §5)
-  toBlock(node): BlockInstance;       // schema → block (pure)
-  fromBlock(block): Node;             // block → schema (pure, round-trip safe)
+  element?: { tag; tags?; classes; attributes? }; // only for blocks Bestenberg renders
+  internal?: boolean;                 // raw: never offered to users or the AI
   ai?: { description: string; examples?: Node[] }; // fed to the model
 };
 ```
+The registry is WP-agnostic. Conversion to and from blocks (`toBlock`/`fromBlock`) lives in `@bestenberg/adapter-blocks`, keyed by component type.
+
 v1 components:
 | Category | Types |
 |---|---|
 | layout | `section`, `container`, `stack`, `row`, `grid`, `card`, `spacer` |
-| content | `heading`, `text`, `list`, `button`, `button-group`, `icon`, `quote`, `divider` |
+| content | `heading`, `text`, `list`, `list-item`, `button`, `button-group`, `icon`, `quote`, `divider` |
+| internal | `raw` (unsupported block kept verbatim) |
 | media | `image`, `video`, `gallery`, `embed` |
 | navigation | `nav-menu`, `site-logo`, `site-title`, `breadcrumbs`, `search` |
 | data | `query-list`, `post-title`, `post-excerpt`, `post-image`, `post-date`, `pagination` |
@@ -133,9 +138,12 @@ UI rules:
 - No inline `style=""` except background images.
 
 ## 7. Serialization
-- Stored form is always block markup (PLAN §2.1). Bestenberg blocks store `{ id, props, style, bind, locked, hidden }` as attributes; core/Woo blocks store their native attributes plus `bestenberg: { id, style, locked, hidden }`.
-- `fromBlock(toBlock(node))` must equal `node` (property test with generated nodes).
-- Unknown blocks found in content are preserved as an opaque `raw` node (read-only, movable, deletable) so nothing is ever lost.
+- Stored form is always block markup (PLAN §2.1). Bestenberg blocks are dynamic and store `{ bbId, props, style, bind, locked, hidden }` as attributes; core/Woo blocks store their native attributes plus `bestenberg: { id, style, locked, hidden }`.
+- Utility classes are never saved in content: Bestenberg blocks compute them in `render`, core blocks get them from the `bestenberg` attribute via a `render_block` filter (button → link, image → img).
+- `@bestenberg/adapter-blocks` reads and writes markup without WordPress loaded (block grammar + the core blocks used). Its output is checked against the real block editor in e2e.
+- `fromBlock(toBlock(node))` equals `node` for canonical nodes (rich text sanitized, empty `children` omitted, core-block components always have `props`). Tested on 300 generated documents through markup.
+- Unknown blocks, freeform HTML and blocks whose HTML or JSON cannot be read become `raw` nodes holding their exact markup (read-only, movable, deletable), with ids derived from a hash of the markup. Nothing is ever lost.
+- Generated from the registry (`pnpm generate`): `wp/plugin/blocks/*/block.json`, `wp/plugin/generated/components.php`, `wp/editor/src/blocks/manifest.ts`, parity fixtures.
 
 ## 8. AI contract
 - The model receives: JSON Schema generated from the registry, component `ai.description`s, the token list, and optionally the current doc.

@@ -142,26 +142,8 @@ final class StyleClasses {
 
 		$layout = $style['layout'] ?? null;
 		if ( is_array( $layout ) ) {
-			$display = $layout['display'] ?? null;
-			if ( 'stack' === $display ) {
-				$add( 'flex' );
-				$add( 'flex-col' );
-			} elseif ( 'row' === $display ) {
-				$add( 'flex' );
-				$add( 'flex-row' );
-			} elseif ( 'grid' === $display ) {
-				$add( 'grid' );
-			}
-			if ( isset( $layout['columns'] ) && is_int( $layout['columns'] ) ) {
-				$add( 'grid-cols-' . $layout['columns'] );
-			}
-			$add( $tok( 'gap-', $layout['gap'] ?? null ) );
-			$align = self::word( $layout['align'] ?? null );
-			$add( null === $align ? null : 'items-' . $align );
-			$justify = self::word( $layout['justify'] ?? null );
-			$add( null === $justify ? null : 'justify-' . $justify );
-			if ( isset( $layout['wrap'] ) && is_bool( $layout['wrap'] ) ) {
-				$add( $layout['wrap'] ? 'flex-wrap' : 'flex-nowrap' );
+			foreach ( self::layout_bases( $layout ) as $base ) {
+				$add( $base );
 			}
 		}
 
@@ -212,6 +194,36 @@ final class StyleClasses {
 		$aspect = self::word( $style['aspect'] ?? null );
 		$add( null === $aspect ? null : $this->utilities->aspect_name( $aspect ) );
 
+		return $out;
+	}
+
+	/**
+	 * Utility base names for a layout value. Same order as styleClasses() in TS.
+	 *
+	 * @param array<mixed> $layout Layout style.
+	 * @return array<string|null>
+	 */
+	private static function layout_bases( array $layout ): array {
+		$display = $layout['display'] ?? null;
+		$out     = match ( $display ) {
+			'stack' => array( 'flex', 'flex-col' ),
+			'row'   => array( 'flex', 'flex-row' ),
+			'grid'  => array( 'grid' ),
+			default => array(),
+		};
+
+		if ( isset( $layout['columns'] ) && is_int( $layout['columns'] ) ) {
+			$out[] = 'grid-cols-' . $layout['columns'];
+		}
+		$gap     = self::token( $layout['gap'] ?? null );
+		$out[]   = null === $gap ? null : 'gap-' . $gap;
+		$align   = self::word( $layout['align'] ?? null );
+		$out[]   = null === $align ? null : 'items-' . $align;
+		$justify = self::word( $layout['justify'] ?? null );
+		$out[]   = null === $justify ? null : 'justify-' . $justify;
+		if ( isset( $layout['wrap'] ) && is_bool( $layout['wrap'] ) ) {
+			$out[] = $layout['wrap'] ? 'flex-wrap' : 'flex-nowrap';
+		}
 		return $out;
 	}
 }
