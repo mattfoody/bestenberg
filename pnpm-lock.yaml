@@ -42,7 +42,11 @@ importers:
         specifier: ^3.2.4
         version: 3.2.7(@types/node@22.20.5)(jsdom@20.0.3)(sass@1.105.1)(terser@5.51.2)(yaml@2.9.1)
 
-  packages/adapter-blocks: {}
+  packages/adapter-blocks:
+    dependencies:
+      '@bestenberg/schema':
+        specifier: workspace:*
+        version: link:../schema
 
   packages/ai: {}
 

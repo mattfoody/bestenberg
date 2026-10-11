@@ -51,10 +51,10 @@
 
 - [ ] **2.1 Layout blocks.** `bestenberg/{section,container,stack,row,grid,card,spacer}` via `block.json` (apiVersion 3), dynamic: `save` returns `InnerBlocks.Content` for containers, `null` otherwise. Attributes: `bbId`, `props`, `style`, `bind`, `locked`, `hidden`. Each has `render.php` that escapes all output and applies classes via the PHP style runtime.
 - [ ] **2.2 TS/PHP parity.** TS generates fixtures (`style → classes`); PHPUnit asserts PHP output matches. Runs in CI.
-- [ ] **2.3 Adapter: own blocks.** `toBlock` / `fromBlock` for all layout components.
-- [ ] **2.4 Adapter: core blocks.** heading, paragraph (`text`), list, buttons/button, image, separator (`divider`), quote. Store `bestenberg: { id, style, locked, hidden }` on the core block; a `render_block` filter adds the classes.
-- [ ] **2.5 Raw nodes.** Unknown blocks become read-only `raw` nodes that round-trip unchanged.
-- [ ] **2.6 Round-trip tests.** Property tests (fast-check): node → block → `serialize` → `parse` → `fromBlock` equals node. Include nested trees and responsive styles.
+- [x] **2.3 Adapter: own blocks.** `toBlock` / `fromBlock` for all layout components.
+- [x] **2.4 Adapter: core blocks.** heading, paragraph (`text`), list, buttons/button, image, separator (`divider`), quote. Store `bestenberg: { id, style, locked, hidden }` on the core block; a `render_block` filter adds the classes.
+- [x] **2.5 Raw nodes.** Unknown blocks become read-only `raw` nodes that round-trip unchanged.
+- [x] **2.6 Round-trip tests.** Property tests (fast-check): node → block → `serialize` → `parse` → `fromBlock` equals node. Include nested trees and responsive styles.
 - [ ] **2.7 TS → PHP render.** e2e: create a page from a TS-built doc via REST, load the frontend, assert no block errors, and snapshot the HTML.
 - [ ] **2.8 Security.** Rich-text sanitization (allowed inline tags only) in TS and PHP; XSS payload tests in props, attributes and URLs.
 
