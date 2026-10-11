@@ -1,0 +1,245 @@
+{
+  "schemaVersion": 1,
+  "kind": "page",
+  "meta": { "title": "Adapter e2e", "slug": "bestenberg-adapter-e2e" },
+  "root": [
+    {
+      "id": "adHero001",
+      "type": "section",
+      "props": { "anchor": "adapter-hero" },
+      "style": {
+        "base": {
+          "padding": { "y": "space.16", "x": "space.6" },
+          "background": "color.primary",
+          "color": "color.on-primary"
+        },
+        "desktop": { "padding": { "y": "space.24" } }
+      },
+      "children": [
+        {
+          "id": "adCont001",
+          "type": "container",
+          "style": { "base": { "width": "container.lg" } },
+          "children": [
+            {
+              "id": "adHead001",
+              "type": "heading",
+              "props": { "text": "Adapter <em>round trip</em>", "level": 1 },
+              "style": {
+                "base": {
+                  "font": { "size": "fontSize.4xl", "weight": "fontWeight.bold", "align": "center" }
+                },
+                "desktop": { "font": { "size": "fontSize.5xl" } }
+              }
+            },
+            {
+              "id": "adText001",
+              "type": "text",
+              "props": {
+                "text": "Built from a TypeScript document &amp; posted via <strong>REST</strong>."
+              },
+              "style": {
+                "base": {
+                  "font": { "size": "fontSize.lg", "align": "center" },
+                  "margin": { "top": "space.4" }
+                }
+              }
+            },
+            {
+              "id": "adBtns001",
+              "type": "button-group",
+              "props": {},
+              "style": {
+                "base": { "layout": { "justify": "center" }, "margin": { "top": "space.8" } }
+              },
+              "children": [
+                {
+                  "id": "adButt001",
+                  "type": "button",
+                  "props": { "text": "Get started", "href": "/start", "variant": "primary" },
+                  "style": {
+                    "base": {
+                      "background": "color.accent",
+                      "color": "color.on-surface",
+                      "padding": { "y": "space.3", "x": "space.6" },
+                      "radius": "radius.md"
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "adFeat001",
+      "type": "section",
+      "props": { "tag": "div", "anchor": "adapter-features" },
+      "style": { "base": { "padding": { "y": "space.16", "x": "space.6" } } },
+      "children": [
+        {
+          "id": "adGrid001",
+          "type": "grid",
+          "style": {
+            "base": { "layout": { "columns": 1, "gap": "space.6" } },
+            "tablet": { "layout": { "columns": 2 } },
+            "desktop": { "layout": { "columns": 3 } }
+          },
+          "children": [
+            {
+              "id": "adCard001",
+              "type": "card",
+              "props": { "tag": "article" },
+              "style": {
+                "base": {
+                  "padding": { "x": "space.6", "y": "space.6" },
+                  "radius": "radius.lg",
+                  "shadow": "shadow.md",
+                  "background": "color.surface"
+                }
+              },
+              "children": [
+                { "id": "adCH00001", "type": "heading", "props": { "text": "Schema", "level": 3 } },
+                {
+                  "id": "adCT00001",
+                  "type": "text",
+                  "props": { "text": "One registry drives everything." }
+                }
+              ]
+            },
+            {
+              "id": "adCard002",
+              "type": "card",
+              "props": { "tag": "article" },
+              "style": {
+                "base": {
+                  "padding": { "x": "space.6", "y": "space.6" },
+                  "radius": "radius.lg",
+                  "shadow": "shadow.md"
+                }
+              },
+              "children": [
+                { "id": "adCH00002", "type": "heading", "props": { "text": "Blocks", "level": 3 } },
+                {
+                  "id": "adCT00002",
+                  "type": "text",
+                  "props": { "text": "Stored as native WordPress blocks." }
+                }
+              ]
+            },
+            {
+              "id": "adCard003",
+              "type": "card",
+              "props": { "tag": "article" },
+              "style": {
+                "base": {
+                  "padding": { "x": "space.6", "y": "space.6" },
+                  "radius": "radius.lg",
+                  "shadow": "shadow.md"
+                }
+              },
+              "children": [
+                { "id": "adCH00003", "type": "heading", "props": { "text": "Tokens", "level": 3 } },
+                {
+                  "id": "adCT00003",
+                  "type": "text",
+                  "props": { "text": "Only token values, never raw CSS." }
+                }
+              ]
+            }
+          ]
+        },
+        { "id": "adSpac001", "type": "spacer", "style": { "base": { "height": "space.8" } } },
+        {
+          "id": "adStak001",
+          "type": "stack",
+          "style": { "base": { "layout": { "gap": "space.4" }, "width": "container.md" } },
+          "children": [
+            {
+              "id": "adList001",
+              "type": "list",
+              "props": { "ordered": true },
+              "children": [
+                { "id": "adLI00001", "type": "list-item", "props": { "text": "Generate" } },
+                {
+                  "id": "adLI00002",
+                  "type": "list-item",
+                  "props": { "text": "Edit" },
+                  "children": [
+                    {
+                      "id": "adList002",
+                      "type": "list",
+                      "props": { "ordered": false },
+                      "children": [
+                        {
+                          "id": "adLI00003",
+                          "type": "list-item",
+                          "props": { "text": "Nested item" }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                { "id": "adLI00004", "type": "list-item", "props": { "text": "Publish" } }
+              ]
+            },
+            {
+              "id": "adQuot001",
+              "type": "quote",
+              "props": { "citation": "Ada Lovelace" },
+              "style": {
+                "base": {
+                  "border": { "width": 1, "color": "color.border" },
+                  "padding": { "x": "space.4" }
+                }
+              },
+              "children": [
+                {
+                  "id": "adQT00001",
+                  "type": "text",
+                  "props": { "text": "The engine weaves patterns." }
+                }
+              ]
+            },
+            {
+              "id": "adDivi001",
+              "type": "divider",
+              "props": {},
+              "style": { "base": { "margin": { "top": "space.8", "bottom": "space.8" } } }
+            },
+            {
+              "id": "adImag001",
+              "type": "image",
+              "props": { "src": "/wp-includes/images/w-logo-blue.png", "alt": "WordPress logo" },
+              "style": { "base": { "radius": "radius.md" } }
+            },
+            {
+              "id": "adRow0001",
+              "type": "row",
+              "style": { "base": { "layout": { "gap": "space.4", "wrap": true } } },
+              "children": [
+                { "id": "adRT00001", "type": "text", "props": { "text": "Row item one" } },
+                { "id": "adRT00002", "type": "text", "props": { "text": "Row item two" } }
+              ]
+            },
+            {
+              "id": "adMobi001",
+              "type": "text",
+              "props": { "text": "Hidden on desktop" },
+              "hidden": { "desktop": true }
+            }
+          ]
+        },
+        {
+          "id": "adRaw0001",
+          "type": "raw",
+          "props": {
+            "name": "core/group",
+            "markup": "<!-- wp:group -->\n<div class=\"wp-block-group\"><!-- wp:paragraph -->\n<p>Inside a group Bestenberg does not edit.</p>\n<!-- /wp:paragraph --></div>\n<!-- /wp:group -->"
+          }
+        }
+      ]
+    }
+  ]
+}

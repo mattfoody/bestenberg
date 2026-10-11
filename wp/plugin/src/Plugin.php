@@ -10,7 +10,10 @@ declare( strict_types=1 );
 namespace Bestenberg;
 
 use Bestenberg\Admin\EditorPage;
+use Bestenberg\Blocks\CoreBlockStyles;
+use Bestenberg\Blocks\LayoutBlocks;
 use Bestenberg\Styles\Collector;
+use Bestenberg\Styles\StyleClasses;
 use Bestenberg\Styles\StyleOutput;
 use Bestenberg\Styles\Utilities;
 
@@ -59,8 +62,14 @@ final class Plugin {
 		}
 		$this->registered = true;
 
+		$utilities     = Utilities::shared();
+		$style_classes = new StyleClasses( $utilities );
+		$config        = LayoutBlocks::config();
+
 		( new EditorPage() )->register();
-		( new StyleOutput( $this->collector(), Utilities::shared() ) )->register();
+		( new StyleOutput( $this->collector(), $utilities ) )->register();
+		( new LayoutBlocks( $config['blocks'], $style_classes, $this->collector() ) )->register();
+		( new CoreBlockStyles( $config['core'], $style_classes, $this->collector() ) )->register();
 	}
 
 	/**

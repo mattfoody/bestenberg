@@ -1,0 +1,19 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "bestenberg/grid",
+  "title": "Grid",
+  "category": "design",
+  "description": "Equal-width columns. Set columns per breakpoint, mobile first (e.g. base 1, desktop 3).",
+  "textdomain": "bestenberg",
+  "attributes": {
+    "bbId": { "type": "string" },
+    "props": { "type": "object" },
+    "style": { "type": "object" },
+    "bind": { "type": "object" },
+    "locked": { "type": "string", "enum": ["none", "content", "all"] },
+    "hidden": { "type": "object" }
+  },
+  "supports": { "html": false, "className": false, "customClassName": false },
+  "editorScript": "bestenberg-blocks"
+}

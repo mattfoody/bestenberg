@@ -47,6 +47,9 @@ importers:
       '@bestenberg/schema':
         specifier: workspace:*
         version: link:../schema
+      '@bestenberg/tokens':
+        specifier: workspace:*
+        version: link:../tokens
 
   packages/ai: {}
 

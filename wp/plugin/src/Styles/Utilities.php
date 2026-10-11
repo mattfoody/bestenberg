@@ -30,6 +30,13 @@ final class Utilities {
 	private array $rules;
 
 	/**
+	 * Aspect value => utility base name, and breakpoint => visibility class.
+	 *
+	 * @var array{aspects: array<string, string>, hidden: array<string, string>}
+	 */
+	private array $aliases;
+
+	/**
 	 * Shared instance loaded from the plugin's generated map.
 	 *
 	 * @var Utilities|null
@@ -39,11 +46,12 @@ final class Utilities {
 	/**
 	 * Constructor.
 	 *
-	 * @param array{media: array<string, string>, rules: array<string, array{0: int, 1: string, 2: string}>} $map Utility map.
+	 * @param array{media: array<string, string>, aliases: array{aspects: array<string, string>, hidden: array<string, string>}, rules: array<string, array{0: int, 1: string, 2: string}>} $map Utility map.
 	 */
 	public function __construct( array $map ) {
-		$this->media = $map['media'];
-		$this->rules = $map['rules'];
+		$this->media   = $map['media'];
+		$this->aliases = $map['aliases'];
+		$this->rules   = $map['rules'];
 	}
 
 	/**
@@ -56,7 +64,7 @@ final class Utilities {
 		/**
 		 * Generated map.
 		 *
-		 * @var array{media: array<string, string>, rules: array<string, array{0: int, 1: string, 2: string}>} $map
+		 * @var array{media: array<string, string>, aliases: array{aspects: array<string, string>, hidden: array<string, string>}, rules: array<string, array{0: int, 1: string, 2: string}>} $map
 		 */
 		$map = require $file;
 		return new self( $map );
@@ -79,6 +87,24 @@ final class Utilities {
 	 */
 	public function has( string $class_name ): bool {
 		return isset( $this->rules[ $class_name ] );
+	}
+
+	/**
+	 * Utility base name for an aspect value ("16/9" => "aspect-video").
+	 *
+	 * @param string $aspect Aspect value.
+	 */
+	public function aspect_name( string $aspect ): ?string {
+		return $this->aliases['aspects'][ $aspect ] ?? null;
+	}
+
+	/**
+	 * Visibility class for a breakpoint ("desktop" => "bb:lg:hidden").
+	 *
+	 * @param string $breakpoint base, tablet or desktop.
+	 */
+	public function hidden_class( string $breakpoint ): ?string {
+		return $this->aliases['hidden'][ $breakpoint ] ?? null;
 	}
 
 	/**

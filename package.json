@@ -11,7 +11,7 @@
   },
   "scripts": {
     "build": "pnpm -r --filter \"./packages/*\" build && pnpm generate && pnpm --filter @bestenberg/editor build",
-    "generate": "node packages/tokens/scripts/generate.mjs",
+    "generate": "node packages/tokens/scripts/generate.mjs && node packages/adapter-blocks/scripts/generate.mjs",
     "typecheck": "pnpm -r typecheck && tsc -p tsconfig.json",
     "lint": "pnpm lint:js && pnpm lint:php",
     "lint:js": "eslint . && prettier --check .",

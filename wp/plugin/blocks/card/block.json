@@ -1,0 +1,19 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "bestenberg/card",
+  "title": "Card",
+  "category": "design",
+  "description": "Self-contained box (feature, testimonial, product teaser).",
+  "textdomain": "bestenberg",
+  "attributes": {
+    "bbId": { "type": "string" },
+    "props": { "type": "object" },
+    "style": { "type": "object" },
+    "bind": { "type": "object" },
+    "locked": { "type": "string", "enum": ["none", "content", "all"] },
+    "hidden": { "type": "object" }
+  },
+  "supports": { "html": false, "className": false, "customClassName": false },
+  "editorScript": "bestenberg-blocks"
+}
