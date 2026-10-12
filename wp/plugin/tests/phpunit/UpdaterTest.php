@@ -48,7 +48,10 @@ final class UpdaterTest extends WP_UnitTestCase {
 		return array(
 			'headers'  => array(),
 			'body'     => $body,
-			'response' => array( 'code' => $code, 'message' => 'x' ),
+			'response' => array(
+				'code'    => $code,
+				'message' => 'x',
+			),
 			'cookies'  => array(),
 			'filename' => null,
 		);
