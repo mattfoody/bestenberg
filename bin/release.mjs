@@ -65,7 +65,11 @@ function currentVersion() {
   const found = versions();
   const unique = [...new Set(Object.values(found))];
   if (unique.length !== 1 || !SEMVER.test(unique[0])) {
-    fail(`version mismatch:\n${Object.entries(found).map(([k, v]) => `  ${k}: ${v}`).join('\n')}`);
+    fail(
+      `version mismatch:\n${Object.entries(found)
+        .map(([k, v]) => `  ${k}: ${v}`)
+        .join('\n')}`,
+    );
   }
   return unique[0];
 }
@@ -89,7 +93,9 @@ function changelogSection(version) {
     body.push(line);
   }
   const markdown = body.join('\n').trim();
-  const items = body.filter((l) => l.startsWith('- ')).map((l) => `<li>${escapeHtml(l.slice(2))}</li>`);
+  const items = body
+    .filter((l) => l.startsWith('- '))
+    .map((l) => `<li>${escapeHtml(l.slice(2))}</li>`);
   return [markdown, items.length > 0 ? `<ul>${items.join('')}</ul>` : ''];
 }
 
@@ -135,7 +141,8 @@ function build(expected) {
 
   const pluginSource = read(FILES.plugin);
   const base = header(pluginSource, 'Update URI');
-  if (!/^https:\/\/[^/]+\/.*\/$/.test(base)) fail(`Update URI must be https and end with "/": ${base}`);
+  if (!/^https:\/\/[^/]+\/.*\/$/.test(base))
+    fail(`Update URI must be https and end with "/": ${base}`);
 
   for (const required of [
     'wp/plugin/build/editor/index.js',
@@ -203,11 +210,14 @@ function build(expected) {
     ['plugin', pluginZip],
     ['theme', themeZip],
   ]) {
-    const listing = execFileSync('unzip', ['-Z1', join(publicDir, kind, file)], { encoding: 'utf8' });
+    const listing = execFileSync('unzip', ['-Z1', join(publicDir, kind, file)], {
+      encoding: 'utf8',
+    });
     const entries = listing.split('\n').filter(Boolean);
     const main = kind === 'plugin' ? 'bestenberg/bestenberg.php' : 'bestenberg/style.css';
     if (!entries.includes(main)) fail(`${file} is missing ${main}`);
-    if (entries.some((e) => /\/(tests|vendor|node_modules)\//.test(e))) fail(`${file} contains dev files`);
+    if (entries.some((e) => /\/(tests|vendor|node_modules)\//.test(e)))
+      fail(`${file} contains dev files`);
     console.log(`  ${kind}: ${file} (${entries.length} files)`);
   }
   console.log(`Release ${version} ready in release/public (base ${base}).`);
@@ -221,7 +231,8 @@ function deploy() {
     fail('set BESTENBERG_DEPLOY_TARGET to user@host:/path/to/updates/bestenberg/ (trailing slash)');
   }
   const publicDir = path('release/public');
-  if (!existsSync(join(publicDir, 'plugin', 'info.json'))) fail('nothing to deploy; run "build" first');
+  if (!existsSync(join(publicDir, 'plugin', 'info.json')))
+    fail('nothing to deploy; run "build" first');
 
   const ssh = process.env.BESTENBERG_DEPLOY_SSH;
   const rsync = (extra) =>
@@ -253,6 +264,7 @@ switch (command) {
     deploy();
     break;
   default:
-    fail(`unknown command "${command ?? ''}". Use bump <version>, build [--expect <version>] or deploy.`);
+    fail(
+      `unknown command "${command ?? ''}". Use bump <version>, build [--expect <version>] or deploy.`,
+    );
 }
-
