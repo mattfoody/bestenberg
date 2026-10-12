@@ -16,6 +16,7 @@ use Bestenberg\Styles\Collector;
 use Bestenberg\Styles\StyleClasses;
 use Bestenberg\Styles\StyleOutput;
 use Bestenberg\Styles\Utilities;
+use Bestenberg\Updates\Updater;
 
 /**
  * Wires up Bestenberg's services. Holds no logic of its own.
@@ -70,6 +71,7 @@ final class Plugin {
 		( new StyleOutput( $this->collector(), $utilities ) )->register();
 		( new LayoutBlocks( $config['blocks'], $style_classes, $this->collector() ) )->register();
 		( new CoreBlockStyles( $config['core'], $style_classes, $this->collector() ) )->register();
+		Updater::from_plugin_header()?->register();
 	}
 
 	/**

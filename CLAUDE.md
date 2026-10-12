@@ -34,5 +34,6 @@ Requirements: Node 20+, pnpm 10, PHP 8.1+, Composer, Docker.
 | Static analysis | `pnpm stan` |
 | Typecheck | `pnpm typecheck` |
 | Everything | `pnpm test:all` |
+| Release (bump, commit, tag) | `pnpm release:bump 0.2.0` then `git push --follow-tags` (see RELEASING.md) |
 
 CI: `.github/workflows/ci.yml` runs JS, PHP (8.1 + 8.3) and WordPress (PHPUnit + e2e) jobs on every push and PR.

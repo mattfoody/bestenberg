@@ -41,6 +41,8 @@ jobs:
             echo "::error title=Stale generated files::Run 'pnpm build' (or 'pnpm generate') and commit the result."
             exit 1
           fi
+      - name: Release packaging works
+        run: bin/ci-run.sh 'Package' node bin/release.mjs build
 
   php:
     name: PHP ${{ matrix.php }} (PHPCS, PHPStan)

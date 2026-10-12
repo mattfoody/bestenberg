@@ -108,7 +108,7 @@ A commercial WordPress product (plugin + base block theme) that replaces the def
 | M6 | AI from screenshot + eval | Screenshot → page; eval harness in CI |
 | M7 | Templates + Woo | Edit templates/parts; Woo templates per §7 scope |
 | M8 | Client mode | Locked structure, content-only editing, onboarding |
-| M9 | Ship | Licensing, updates, packaging, docs, demo site |
+| M9 | Ship | Licensing, packaging, docs, demo site (self-hosted updates already in place, see RELEASING.md) |
 
 ## 9. Non-goals (v1)
 Headless output, multilingual, real-time collaboration, importing from other builders, hosted site builder/SaaS.

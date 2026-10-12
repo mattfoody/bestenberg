@@ -16,7 +16,7 @@ use WP_UnitTestCase;
 final class PluginTest extends WP_UnitTestCase {
 
 	public function test_constants_are_defined(): void {
-		$this->assertSame( '0.1.0', BESTENBERG_VERSION );
+		$this->assertMatchesRegularExpression( '/^\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?$/', BESTENBERG_VERSION );
 		$this->assertDirectoryExists( BESTENBERG_DIR );
 	}
 

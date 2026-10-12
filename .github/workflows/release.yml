@@ -1,0 +1,59 @@
+name: Release
+
+# Runs when a version tag is pushed (`pnpm release:bump 0.2.0 && git push --follow-tags`).
+# Builds the plugin and theme zips, uploads them to the update server and
+# creates a GitHub release. See RELEASING.md for the one-time server setup.
+on:
+  push:
+    tags: ['v*.*.*']
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+      - run: pnpm install --frozen-lockfile
+      - run: bin/ci-run.sh 'Unit tests' pnpm test
+      - run: bin/ci-run.sh 'Build' pnpm build
+      - name: Generated files are up to date
+        run: git diff --exit-code --stat
+      - name: Package
+        run: bin/ci-run.sh 'Package' node bin/release.mjs build --expect "${GITHUB_REF_NAME#v}"
+
+      - name: Upload to update server
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+          DEPLOY_SSH_PORT: ${{ secrets.DEPLOY_SSH_PORT }}
+          BESTENBERG_DEPLOY_TARGET: ${{ secrets.DEPLOY_TARGET }}
+        run: |
+          if [ -z "$DEPLOY_SSH_KEY" ] || [ -z "$DEPLOY_KNOWN_HOSTS" ] || [ -z "$BESTENBERG_DEPLOY_TARGET" ]; then
+            echo "::error title=Deploy secrets missing::Set DEPLOY_SSH_KEY, DEPLOY_KNOWN_HOSTS and DEPLOY_TARGET (see RELEASING.md)."
+            exit 1
+          fi
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          export BESTENBERG_DEPLOY_SSH="ssh -p ${DEPLOY_SSH_PORT:-22} -i $HOME/.ssh/deploy_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes"
+          bin/ci-run.sh 'Deploy' node bin/release.mjs deploy
+
+      - name: GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          gh release create "$GITHUB_REF_NAME"
+          release/public/plugin/*.zip release/public/theme/*.zip
+          --title "Bestenberg ${GITHUB_REF_NAME#v}"
+          --notes-file release/notes.md
