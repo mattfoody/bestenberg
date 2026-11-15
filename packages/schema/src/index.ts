@@ -9,6 +9,7 @@ export * from './style-classes';
 export * from './rich-text';
 export * from './samples';
 export * from './validate';
+export * from './ops';
 export * from './registry/types';
 export * from './registry/registry';
 export * from './registry/controls';

@@ -86,6 +86,7 @@ export const section = defineComponent({
     ...boxControls({}),
   ],
   element: { tag: 'section', tags: SECTION_TAGS, classes: ['bb-section'] },
+  defaults: { style: { base: { padding: { x: 'space.6', y: 'space.16' } } } },
   ai: { description: 'Full-width page band. Top-level building block of a page.' },
 });
 
@@ -100,6 +101,7 @@ export const container = defineComponent({
   allowedChildren: 'any',
   controls: boxControls({}),
   element: { tag: 'div', classes: ['bb-container'] },
+  defaults: { style: { base: { width: 'container.lg' } } },
   ai: { description: 'Constrains content to a container width, usually inside a section.' },
 });
 
@@ -114,6 +116,7 @@ export const stack = defineComponent({
   allowedChildren: 'any',
   controls: boxControls({ display: false, columns: false }),
   element: { tag: 'div', classes: ['bb-stack', 'bb:flex', 'bb:flex-col'] },
+  defaults: { style: { base: { layout: { gap: 'space.4' } } } },
   ai: { description: 'Vertical flow of children with a token gap.' },
 });
 
@@ -128,6 +131,7 @@ export const row = defineComponent({
   allowedChildren: 'any',
   controls: boxControls({ display: false, columns: false }),
   element: { tag: 'div', classes: ['bb-row', 'bb:flex', 'bb:flex-row'] },
+  defaults: { style: { base: { layout: { gap: 'space.4', wrap: true } } } },
   ai: { description: 'Horizontal flow of children; wraps optionally.' },
 });
 
@@ -142,6 +146,12 @@ export const grid = defineComponent({
   allowedChildren: 'any',
   controls: boxControls({ display: false, wrap: false }),
   element: { tag: 'div', classes: ['bb-grid', 'bb:grid'] },
+  defaults: {
+    style: {
+      base: { layout: { columns: 1, gap: 'space.6' } },
+      desktop: { layout: { columns: 3 } },
+    },
+  },
   ai: {
     description:
       'Equal-width columns. Set columns per breakpoint, mobile first (e.g. base 1, desktop 3).',
@@ -159,6 +169,11 @@ export const card = defineComponent({
   allowedChildren: 'any',
   controls: [tagControl(CARD_TAGS), ...boxControls({})],
   element: { tag: 'div', tags: CARD_TAGS, classes: ['bb-card'] },
+  defaults: {
+    style: {
+      base: { padding: { x: 'space.6', y: 'space.6' }, radius: 'radius.lg', shadow: 'shadow.md' },
+    },
+  },
   ai: { description: 'Self-contained box (feature, testimonial, product teaser).' },
 });
 
@@ -185,6 +200,7 @@ export const spacer = defineComponent({
     ...visibilityControls(),
   ],
   element: { tag: 'div', classes: ['bb-spacer'], attributes: { 'aria-hidden': 'true' } },
+  defaults: { style: { base: { height: 'space.8' } } },
   ai: { description: 'Empty vertical space. Prefer gap and padding; use sparingly.' },
 });
 
@@ -218,6 +234,7 @@ export const heading = defineComponent({
     ...marginControls(),
     ...visibilityControls(),
   ],
+  defaults: { props: { text: 'Heading', level: 2 } },
   ai: { description: 'Section or page heading. One level 1 heading per page.' },
 });
 
@@ -237,6 +254,7 @@ export const text = defineComponent({
     ...marginControls(),
     ...visibilityControls(),
   ],
+  defaults: { props: { text: 'Write something…' } },
   ai: { description: 'Paragraph of body text. Inline bold, italic and links only.' },
 });
 
@@ -256,6 +274,7 @@ export const list = defineComponent({
     ...marginControls(),
     ...visibilityControls(),
   ],
+  defaults: { props: { ordered: false }, children: ['list-item'] },
   ai: { description: 'Bulleted or numbered list of list-item children.' },
 });
 
@@ -270,6 +289,7 @@ export const listItem = defineComponent({
   allowedChildren: ['list'],
   allowedParents: ['list'],
   controls: [richTextControl()],
+  defaults: { props: { text: 'List item' } },
   ai: { description: 'One list entry. May contain a nested list.' },
 });
 
@@ -287,6 +307,7 @@ export const buttonGroup = defineComponent({
     ...marginControls(),
     ...visibilityControls(),
   ],
+  defaults: { props: {}, children: ['button'] },
   ai: { description: 'Row of buttons. Buttons must be inside a button group.' },
 });
 
@@ -332,6 +353,7 @@ export const button = defineComponent({
     ...effectsControls(),
     ...visibilityControls(),
   ],
+  defaults: { props: { text: 'Button', variant: 'primary' } },
   ai: { description: 'Call to action link styled as a button.' },
 });
 
@@ -342,7 +364,7 @@ export const image = defineComponent({
   category: 'media',
   block: 'core/image',
   props: z.strictObject({
-    src: UrlSchema,
+    src: z.union([z.literal(''), UrlSchema]),
     alt: z.string(),
     mediaId: z.number().int().positive().optional(),
   }),
@@ -356,6 +378,7 @@ export const image = defineComponent({
     ...marginControls(),
     ...visibilityControls(),
   ],
+  defaults: { props: { src: '', alt: '' } },
   ai: { description: 'Image with required alt text (empty string if decorative).' },
 });
 
@@ -369,6 +392,7 @@ export const divider = defineComponent({
   styles: ['margin'],
   allowedChildren: 'none',
   controls: [...marginControls(), ...visibilityControls()],
+  defaults: { props: {} },
   ai: { description: 'Horizontal rule between content.' },
 });
 
@@ -395,6 +419,7 @@ export const quote = defineComponent({
     ...effectsControls().filter((c) => c.id.startsWith('border.')),
     ...visibilityControls(),
   ],
+  defaults: { props: {}, children: ['text'] },
   ai: { description: 'Quotation made of text children, with an optional citation.' },
 });
 

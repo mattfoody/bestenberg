@@ -12,3 +12,4 @@ playwright-report/
 .phpunit.result.cache
 .vitest/
 release/
+.wp-sqlite/

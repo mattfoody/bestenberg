@@ -1,7 +1,7 @@
 import type { TokenCategory } from '@bestenberg/tokens';
 import type { z } from 'zod/v4';
 import type { Node } from '../document';
-import type { StyleKey } from '../style';
+import type { ResponsiveStyle, StyleKey } from '../style';
 
 /** Fixed inspector group order (SCHEMA.md §5). */
 export const CONTROL_GROUPS = [
@@ -83,6 +83,13 @@ export interface ComponentDef {
   controls: readonly ControlDef[];
   /** Present for components rendered by Bestenberg (not core/Woo blocks). */
   element?: ElementDef;
+  /** What a newly inserted node starts with (see createNode). */
+  defaults?: {
+    props?: Record<string, unknown>;
+    style?: ResponsiveStyle;
+    /** Child component types created with the node. */
+    children?: readonly string[];
+  };
   /** Internal components (raw) are never offered to users or the AI. */
   internal?: boolean;
   ai?: { description: string; examples?: Node[] };
