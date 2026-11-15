@@ -6,6 +6,7 @@
  *   wp/editor/src/blocks/manifest.ts              editor block registration list
  *   wp/plugin/tests/fixtures/style-classes.json   TS → PHP parity cases
  *   wp/plugin/tests/fixtures/adapter-page.html    markup of fixtures/adapter-page.json
+ *   wp/theme/templates/*.html, wp/theme/parts/*.html   base theme (from src/theme.ts)
  *
  * Run after building the packages: `pnpm generate`.
  */
@@ -20,6 +21,7 @@ import {
   docToMarkup,
   ownComponents,
   runtimeConfig,
+  THEME_FILES,
 } from '@bestenberg/adapter-blocks';
 import {
   BREAKPOINTS,
@@ -149,4 +151,18 @@ if (!result.ok) {
 }
 await write('wp/plugin/tests/fixtures/adapter-page.html', `${docToMarkup(doc)}\n`);
 
-console.log(`  ${own.length} Bestenberg blocks, ${withClasses.length} parity cases`);
+// 6. Base theme templates and parts (directories are fully generated).
+for (const directory of ['templates', 'parts']) {
+  await rm(resolve(root, 'wp/theme', directory), { recursive: true, force: true });
+}
+for (const themeFile of THEME_FILES) {
+  const check = validateDoc(themeFile.doc, { registry: defaultRegistry });
+  if (!check.ok) {
+    throw new Error(`${themeFile.path} is invalid:\n${JSON.stringify(check.issues, null, 2)}`);
+  }
+  await write(`wp/theme/${themeFile.path}`, `${docToMarkup(themeFile.doc)}\n`);
+}
+
+console.log(
+  `  ${own.length} Bestenberg blocks, ${withClasses.length} parity cases, ${THEME_FILES.length} theme files`,
+);

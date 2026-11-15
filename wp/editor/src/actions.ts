@@ -1,5 +1,5 @@
 import type { Dispatch } from 'react';
-import { docToMarkup, markupToNodes } from '@bestenberg/adapter-blocks';
+import { docToMarkup, getDynamicBlock, markupToNodes, rawNode } from '@bestenberg/adapter-blocks';
 import {
   createNode,
   defaultRegistry as registry,
@@ -25,8 +25,11 @@ export { registry };
 export function docFromPost(post: LoadedPost): Doc {
   return {
     schemaVersion: 1,
-    kind: 'page',
-    meta: { title: post.title.trim() === '' ? 'Untitled' : post.title },
+    kind: post.rest === 'templates' ? 'template' : post.rest === 'template-parts' ? 'part' : 'page',
+    meta: {
+      title: post.title.trim() === '' ? 'Untitled' : post.title,
+      ...(post.slug && /^[a-z0-9][a-z0-9-]*$/.test(post.slug) ? { slug: post.slug } : {}),
+    },
     root: markupToNodes(post.content),
   };
 }
@@ -34,14 +37,18 @@ export function docFromPost(post: LoadedPost): Doc {
 export async function openPost(
   dispatch: Dispatch<Action>,
   rest: string,
-  id: number,
+  id: number | string,
 ): Promise<void> {
   dispatch({ type: 'loading' });
   try {
     const post = await loadPost(rest, id);
     dispatch({ type: 'loaded', post, doc: docFromPost(post) });
     const url = new URL(window.location.href);
-    url.searchParams.set('post', String(id));
+    url.searchParams.delete('post');
+    url.searchParams.delete('template');
+    url.searchParams.delete('part');
+    const param = rest === 'templates' ? 'template' : rest === 'template-parts' ? 'part' : 'post';
+    url.searchParams.set(param, String(id));
     window.history.replaceState(null, '', url);
   } catch (error) {
     dispatch({ type: 'failed', text: `This page could not be opened. ${errorMessage(error)}` });
@@ -73,6 +80,22 @@ export function insert(state: EditorState, dispatch: Dispatch<Action>, type: str
   const place = insertPlacement(doc, registry, state.selectedId, type);
   if (!place) return false;
   const node = createNode(registry, type);
+  dispatch({
+    type: 'commit',
+    doc: insertNode(doc, registry, place.parentId, place.index, node),
+    select: node.id,
+  });
+  return true;
+}
+
+/** Adds a WordPress or WooCommerce block that shows site, post or store data. */
+export function insertDynamic(state: EditorState, dispatch: Dispatch<Action>, id: string): boolean {
+  const doc = currentDoc(state);
+  const block = getDynamicBlock(id);
+  if (!doc || !block) return false;
+  const place = insertPlacement(doc, registry, state.selectedId, 'raw');
+  if (!place) return false;
+  const node = rawNode(block.markup);
   dispatch({
     type: 'commit',
     doc: insertNode(doc, registry, place.parentId, place.index, node),

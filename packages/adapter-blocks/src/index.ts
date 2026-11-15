@@ -50,3 +50,6 @@ export function markupToBlocks(markup: string, options: ConvertOptions = {}): Bl
 export function markupToNodes(markup: string, options: ConvertOptions = {}): Node[] {
   return blocksToNodes(markupToBlocks(markup, options), options);
 }
+
+export * from './dynamic';
+export * from './theme';

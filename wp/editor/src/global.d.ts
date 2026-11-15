@@ -37,7 +37,8 @@ declare module '@wordpress/api-fetch' {
 /** Data printed by Bestenberg\Admin\EditorPage::settings(). */
 interface BestenbergEditorSettings {
   version: string;
-  postId: number;
+  /** Post id, or a template id (`theme//slug`); 0 = none. */
+  postId: number | string;
   postRest: string;
   homeUrl: string;
   canvasNonce: string;
@@ -46,6 +47,10 @@ interface BestenbergEditorSettings {
   editorUrl: string;
   adminUrl: string;
   canDesign: boolean;
+  /** Active theme (stylesheet) slug. */
+  theme: string;
+  /** Whether WooCommerce is active. */
+  hasStore: boolean;
 }
 
 interface WpMediaAttachment {

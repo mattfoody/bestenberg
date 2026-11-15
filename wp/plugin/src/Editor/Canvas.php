@@ -17,13 +17,16 @@ namespace Bestenberg\Editor;
  * style can be previewed instantly.
  *
  * URL: /?bestenberg-canvas=<post id>&_wpnonce=<nonce>. Only users who can edit
- * that post get a canvas; everyone else gets the normal page.
+ * that post get a canvas; everyone else gets the normal page. Templates and
+ * template parts use /?bestenberg-canvas=template: a bare page with the same
+ * styles, for users who can edit theme options.
  */
 final class Canvas {
 
 	public const QUERY_ARG    = 'bestenberg-canvas';
 	public const NONCE_ACTION = 'bestenberg-canvas';
 	public const ROOT_ID      = 'bb-canvas-root';
+	public const TEMPLATE     = 'template';
 
 	/**
 	 * Post being edited in this request (0 = not a canvas request).
@@ -31,6 +34,13 @@ final class Canvas {
 	 * @var int
 	 */
 	private int $post_id = 0;
+
+	/**
+	 * Whether this request renders the bare canvas for a template or part.
+	 *
+	 * @var bool
+	 */
+	private bool $blank = false;
 
 	/**
 	 * Registers hooks.
@@ -58,7 +68,27 @@ final class Canvas {
 	 * Whether this request renders a canvas.
 	 */
 	public function is_active(): bool {
-		return $this->post_id > 0;
+		return $this->post_id > 0 || $this->blank;
+	}
+
+	/**
+	 * Canvas URL for templates and template parts.
+	 */
+	public static function template_url(): string {
+		return add_query_arg(
+			array(
+				self::QUERY_ARG => self::TEMPLATE,
+				'_wpnonce'      => wp_create_nonce( self::NONCE_ACTION ),
+			),
+			home_url( '/' )
+		);
+	}
+
+	/**
+	 * The bare canvas page.
+	 */
+	public function blank_template(): string {
+		return BESTENBERG_DIR . 'templates/canvas.php';
 	}
 
 	/**
@@ -69,9 +99,22 @@ final class Canvas {
 	 */
 	public function route( array $query_vars ): array {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Verified below.
-		$requested = isset( $_GET[ self::QUERY_ARG ] ) ? absint( wp_unslash( $_GET[ self::QUERY_ARG ] ) ) : 0;
+		$value     = isset( $_GET[ self::QUERY_ARG ] ) ? sanitize_key( wp_unslash( $_GET[ self::QUERY_ARG ] ) ) : '';
+		$requested = absint( $value );
 		$nonce     = isset( $_GET['_wpnonce'] ) ? sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ) : '';
-		if ( $requested <= 0 || false === wp_verify_nonce( $nonce, self::NONCE_ACTION ) ) {
+		if ( '' === $value || false === wp_verify_nonce( $nonce, self::NONCE_ACTION ) ) {
+			return $query_vars;
+		}
+		// Templates and template parts are edited on a bare page, not inside a post.
+		if ( self::TEMPLATE === $value ) {
+			if ( current_user_can( 'edit_theme_options' ) ) {
+				$this->blank = true;
+				$this->activate();
+				add_filter( 'template_include', array( $this, 'blank_template' ), PHP_INT_MAX );
+			}
+			return $query_vars;
+		}
+		if ( $requested <= 0 ) {
 			return $query_vars;
 		}
 		$post = get_post( $requested );

@@ -19,33 +19,34 @@ const pages: CreatedPage[] = [];
 async function createPage(page: Page): Promise<CreatedPage> {
   await page.goto('/wp-admin/admin.php?page=bestenberg');
   await expect(page.locator('.bestenberg-app__title')).toHaveText('Bestenberg');
-  return page.evaluate(() =>
+  const created = await page.evaluate(() =>
     (window as unknown as { wp: Wp }).wp.apiFetch<CreatedPage>({
       path: '/wp/v2/pages',
       method: 'POST',
       data: { title: 'Bestenberg editor e2e', status: 'publish', content: '' },
     }),
   );
+  pages.push(created);
+  return created;
 }
 
 test.describe('M3 editor', () => {
-  test.afterAll(async ({ browser }) => {
-    if (pages.length === 0) return;
-    const page = await browser.newPage();
+  test.afterEach(async ({ page }) => {
+    const ids = pages.splice(0).map((created) => created.id);
+    if (ids.length === 0) return;
     await page.goto('/wp-admin/admin.php?page=bestenberg');
     await page.evaluate(
-      (ids) =>
+      (list) =>
         Promise.all(
-          ids.map((id) =>
+          list.map((id) =>
             (window as unknown as { wp: Wp }).wp.apiFetch({
               path: `/wp/v2/pages/${id}?force=true`,
               method: 'DELETE',
             }),
           ),
         ),
-      pages.map((created) => created.id),
+      ids,
     );
-    await page.close();
   });
 
   test('builds, styles, saves and reloads a page', async ({ page }) => {

@@ -57,12 +57,16 @@ export function TopBar() {
         );
       return;
     }
-    const [rest, id] = key.split(':');
-    if (rest && id) void openPost(dispatch, rest, Number(id));
+    const at = key.indexOf(':');
+    const rest = key.slice(0, at);
+    const id = key.slice(at + 1);
+    if (at > 0 && id) void openPost(dispatch, rest, /^\d+$/.test(id) ? Number(id) : id);
   };
 
   const pages = posts.filter((post) => post.rest === 'pages');
   const articles = posts.filter((post) => post.rest === 'posts');
+  const templates = posts.filter((post) => post.rest === 'templates');
+  const parts = posts.filter((post) => post.rest === 'template-parts');
   const current = state.post ? `${state.post.rest}:${state.post.id}` : '';
   const known = posts.some((post) => `${post.rest}:${post.id}` === current);
 
@@ -99,6 +103,24 @@ export function TopBar() {
           <optgroup label="Posts">
             {articles.map((post) => (
               <option key={post.id} value={`posts:${post.id}`}>
+                {optionLabel(post)}
+              </option>
+            ))}
+          </optgroup>
+        )}
+        {templates.length > 0 && (
+          <optgroup label="Templates">
+            {templates.map((post) => (
+              <option key={post.id} value={`templates:${post.id}`}>
+                {optionLabel(post)}
+              </option>
+            ))}
+          </optgroup>
+        )}
+        {parts.length > 0 && (
+          <optgroup label="Header and footer">
+            {parts.map((post) => (
+              <option key={post.id} value={`template-parts:${post.id}`}>
                 {optionLabel(post)}
               </option>
             ))}
@@ -179,7 +201,7 @@ export function TopBar() {
         >
           Redo
         </button>
-        {state.post && (
+        {state.post && state.post.link !== '' && (
           <a
             className="bbe-button bbe-button--quiet"
             href={state.post.link}

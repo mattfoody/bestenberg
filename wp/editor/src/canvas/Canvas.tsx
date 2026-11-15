@@ -67,7 +67,7 @@ export function Canvas({ onShortcut }: Props) {
   const linking = useRef<{ range: Range; anchor: HTMLAnchorElement | null } | null>(null);
 
   const doc = currentDoc(state);
-  const postId = state.post?.id ?? null;
+  const post = state.post;
   const { selectedId, viewport } = state;
 
   const frameDocument = () => frame.current?.contentDocument ?? null;
@@ -243,14 +243,16 @@ export function Canvas({ onShortcut }: Props) {
           const element = elementFor(node.id);
           if (element?.classList.contains('bb-raw')) element.innerHTML = html;
         };
-        const cached = rawHtml.current.get(markup);
+        const post = stateRef.current.post;
+        const key = `${post?.rest ?? ''}:${post?.id ?? ''}|${markup}`;
+        const cached = rawHtml.current.get(key);
         if (cached !== undefined) {
           place(cached);
           return;
         }
-        renderMarkup(markup)
+        renderMarkup(markup, post)
           .then((html) => {
-            rawHtml.current.set(markup, html);
+            rawHtml.current.set(key, html);
             place(html);
           })
           .catch(() => undefined);
@@ -338,16 +340,16 @@ export function Canvas({ onShortcut }: Props) {
     if (!(event.target instanceof HTMLInputElement)) event.preventDefault();
   };
 
-  if (postId === null) return <div className="bbe-canvas" ref={wrapper} />;
+  if (post === null) return <div className="bbe-canvas" ref={wrapper} />;
 
   return (
     <div className="bbe-canvas" ref={wrapper}>
       <iframe
-        key={postId}
+        key={`${post.rest}:${post.id}`}
         ref={frame}
         className="bbe-canvas__frame"
         title="Page preview"
-        src={canvasUrl(postId)}
+        src={canvasUrl(post)}
         style={{ width: VIEWPORT_WIDTH[viewport] }}
         onLoad={onLoad}
       />

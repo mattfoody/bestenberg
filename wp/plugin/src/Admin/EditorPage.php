@@ -22,6 +22,22 @@ final class EditorPage {
 	public const HANDLE     = 'bestenberg-editor';
 
 	/**
+	 * URL parameters that open a template or template part.
+	 *
+	 * @var array<string, array{post_type: string, rest: string}>
+	 */
+	private const TEMPLATE_ARGS = array(
+		'template' => array(
+			'post_type' => 'wp_template',
+			'rest'      => 'templates',
+		),
+		'part'     => array(
+			'post_type' => 'wp_template_part',
+			'rest'      => 'template-parts',
+		),
+	);
+
+	/**
 	 * Hook suffix returned by add_menu_page().
 	 *
 	 * @var string
@@ -146,10 +162,27 @@ final class EditorPage {
 		if ( $post_id > 0 && ! current_user_can( 'edit_post', $post_id ) ) {
 			$post_id = 0;
 		}
+		$open = array(
+			'id'   => $post_id,
+			'rest' => self::rest_base( $post_id ),
+		);
+		if ( 0 === $post_id && current_user_can( 'edit_theme_options' ) ) {
+			foreach ( self::TEMPLATE_ARGS as $arg => $type ) {
+				// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only navigation parameter.
+				$id = isset( $_GET[ $arg ] ) ? sanitize_text_field( wp_unslash( $_GET[ $arg ] ) ) : '';
+				if ( '' !== $id && null !== get_block_template( $id, $type['post_type'] ) ) {
+					$open = array(
+						'id'   => $id,
+						'rest' => $type['rest'],
+					);
+					break;
+				}
+			}
+		}
 		return array(
 			'version'     => BESTENBERG_VERSION,
-			'postId'      => $post_id,
-			'postRest'    => self::rest_base( $post_id ),
+			'postId'      => $open['id'],
+			'postRest'    => $open['rest'],
 			'homeUrl'     => home_url( '/' ),
 			'canvasNonce' => wp_create_nonce( Canvas::NONCE_ACTION ),
 			'canvasArg'   => Canvas::QUERY_ARG,
@@ -157,6 +190,8 @@ final class EditorPage {
 			'editorUrl'   => self::url(),
 			'adminUrl'    => admin_url(),
 			'canDesign'   => current_user_can( 'edit_theme_options' ),
+			'theme'       => get_stylesheet(),
+			'hasStore'    => class_exists( 'WooCommerce' ),
 		);
 	}
 

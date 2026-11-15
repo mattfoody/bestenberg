@@ -100,6 +100,66 @@ final class EditorTest extends WP_UnitTestCase {
 		$this->assertContains( 'bb-canvas', get_body_class() );
 	}
 
+	public function test_render_endpoint_shows_post_blocks_for_the_post_being_edited(): void {
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'editor' ) ) );
+		$post_id = self::factory()->post->create( array( 'post_title' => 'Edited post title' ) );
+
+		$request = new WP_REST_Request( 'POST', '/bestenberg/v1/render' );
+		$request->set_param( 'markup', '<!-- wp:post-title /-->' );
+		$request->set_param( 'postId', $post_id );
+		$html = rest_get_server()->dispatch( $request )->get_data()['html'];
+
+		$this->assertStringContainsString( 'Edited post title', $html );
+	}
+
+	public function test_render_endpoint_samples_a_published_post_for_templates(): void {
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'editor' ) ) );
+		self::factory()->post->create(
+			array(
+				'post_title'  => 'Unpublished draft',
+				'post_status' => 'draft',
+				'post_date'   => '2030-01-01 00:00:00',
+			)
+		);
+		self::factory()->post->create( array( 'post_title' => 'Sample for templates' ) );
+
+		$request = new WP_REST_Request( 'POST', '/bestenberg/v1/render' );
+		$request->set_param( 'markup', '<!-- wp:post-title /-->' );
+		$request->set_param( 'postType', 'post' );
+		$html = rest_get_server()->dispatch( $request )->get_data()['html'];
+
+		$this->assertStringContainsString( 'Sample for templates', $html );
+		$this->assertStringNotContainsString( 'Unpublished draft', $html );
+	}
+
+	public function test_render_endpoint_ignores_a_post_the_user_cannot_edit(): void {
+		$post_id = self::factory()->post->create(
+			array(
+				'post_title'  => 'Private to someone else',
+				'post_status' => 'private',
+			)
+		);
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'author' ) ) );
+
+		$request = new WP_REST_Request( 'POST', '/bestenberg/v1/render' );
+		$request->set_param( 'markup', '<!-- wp:post-title /-->' );
+		$request->set_param( 'postId', $post_id );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertStringNotContainsString( 'Private to someone else', $response->get_data()['html'] );
+	}
+
+	public function test_template_canvas_needs_the_design_capability(): void {
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'editor' ) ) );
+		$this->go_to( Canvas::template_url() );
+		$this->assertNotContains( 'bb-canvas', get_body_class() );
+
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+		$this->go_to( Canvas::template_url() );
+		$this->assertContains( 'bb-canvas', get_body_class() );
+	}
+
 	public function test_editor_url_opens_a_post(): void {
 		$this->assertStringContainsString( 'page=' . EditorPage::SLUG, EditorPage::url() );
 		$this->assertStringContainsString( 'post=12', EditorPage::url( 12 ) );

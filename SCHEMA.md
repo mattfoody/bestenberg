@@ -145,6 +145,7 @@ UI rules:
 - `@bestenberg/adapter-blocks` reads and writes markup without WordPress loaded (block grammar + the core blocks used). Its output is checked against the real block editor in e2e.
 - `fromBlock(toBlock(node))` equals `node` for canonical nodes (rich text sanitized, empty `children` omitted, core-block components always have `props`). Tested on 300 generated documents through markup.
 - Unknown blocks, freeform HTML and blocks whose HTML or JSON cannot be read become `raw` nodes holding their exact markup (read-only, movable, deletable), with ids derived from a hash of the markup. Nothing is ever lost.
+- Site, post and store data are raw nodes too: `DYNAMIC_BLOCKS` (adapter) is the curated list of WordPress/WooCommerce blocks the editor offers under "Site data". Theme templates and parts are documents of kind `template`/`part` (`THEME_FILES`), generated into `wp/theme`.
 - Generated from the registry (`pnpm generate`): `wp/plugin/blocks/*/block.json`, `wp/plugin/generated/components.php`, `wp/editor/src/blocks/manifest.ts`, parity fixtures.
 
 ## 8. AI contract

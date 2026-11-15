@@ -19,7 +19,7 @@ function Editor() {
 
   useEffect(() => {
     const { postId, postRest } = settings();
-    if (postId > 0) void openPost(dispatch, postRest, postId);
+    if (postId !== 0 && postId !== '') void openPost(dispatch, postRest, postId);
   }, [dispatch]);
 
   const onShortcut = useCallback(

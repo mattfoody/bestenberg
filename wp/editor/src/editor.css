@@ -541,7 +541,10 @@ html.wp-toolbar:has(body.bestenberg-fullscreen) {
 }
 
 .bbe-inserter .bbe-segmented button {
-  flex: 1;
+  flex: 1 1 auto;
+  padding-inline: 6px;
+  font-size: 12px;
+  white-space: nowrap;
 }
 
 .bbe-inserter__patterns {

@@ -114,3 +114,13 @@
 
 **Done when:** a screenshot can be turned into sections in the editor and the harness runs in CI.
 
+## M7 — Templates + WooCommerce
+
+- [x] **7.1 Theme as documents.** Every base-theme template and part is a schema document in `packages/adapter-blocks/src/theme.ts`; `pnpm generate` validates them and writes `wp/theme/templates` and `wp/theme/parts`.
+- [x] **7.2 Site, post and store data.** `DYNAMIC_BLOCKS`: WordPress and WooCommerce blocks (site title, menu, search, post title/content/image/date, post list, product grid, mini cart, account, …) placed as raw nodes; "Site data" tab in the inserter (store entries only when WooCommerce is active).
+- [x] **7.3 Template editing.** Templates and parts appear in the page picker for users who can edit theme options; they open on a bare canvas (`?bestenberg-canvas=template`), save through `/wp/v2/templates` and `/wp/v2/template-parts`, and can be linked with `&template=` / `&part=`.
+- [x] **7.4 Previews in context.** `POST bestenberg/v1/render` renders raw blocks for the post being edited, or for a published example of the template's post type (`single-product` → a product).
+- [x] **7.5 Store templates.** Product, catalog, cart, checkout and order confirmation templates: Bestenberg layout around WooCommerce blocks.
+- [x] **7.6 Tests.** Theme documents (valid, round trip), PHPUnit for render context and the template canvas, e2e: guest purchase from product to order received, catalog, footer edited for the whole site, template opened from the picker.
+
+**Done when:** a designer can restyle header, footer and store templates in the editor and a visitor can complete a purchase.

@@ -1,5 +1,6 @@
 import { useState } from '@wordpress/element';
 import type { DragEvent } from 'react';
+import { DYNAMIC_BLOCKS, DYNAMIC_GROUPS, DYNAMIC_GROUP_LABELS } from '@bestenberg/adapter-blocks';
 import {
   PATTERNS,
   PATTERN_CATEGORIES,
@@ -10,7 +11,8 @@ import {
   type Doc,
   type Node,
 } from '@bestenberg/schema';
-import { insert, insertPattern, move, registry } from '../actions';
+import { insert, insertDynamic, insertPattern, move, registry } from '../actions';
+import { settings } from '../api';
 import { currentDoc, useStore } from '../store';
 
 type DropPosition = 'before' | 'inside' | 'after';
@@ -37,7 +39,10 @@ export function nodeSummary(node: Node): string {
   const props = node.props ?? {};
   if (typeof props.text === 'string') return plainText(props.text);
   if (typeof props.alt === 'string' && props.alt !== '') return props.alt;
-  if (node.type === 'raw' && typeof props.name === 'string') return props.name;
+  if (node.type === 'raw' && typeof props.name === 'string') {
+    const known = DYNAMIC_BLOCKS.find((block) => block.markup === props.markup);
+    return known ? known.label : props.name;
+  }
   return '';
 }
 
@@ -70,7 +75,7 @@ export function Structure() {
   const [drop, setDrop] = useState<DropTarget | null>(null);
   const [collapsed, setCollapsed] = useState<ReadonlySet<string>>(new Set());
   const [adding, setAdding] = useState(false);
-  const [tab, setTab] = useState<'sections' | 'components'>('sections');
+  const [tab, setTab] = useState<'sections' | 'components' | 'data'>('sections');
 
   if (!doc) return <aside className="bbe-panel bbe-structure" aria-label="Page structure" />;
 
@@ -200,6 +205,9 @@ export function Structure() {
             >
               Components
             </button>
+            <button type="button" aria-pressed={tab === 'data'} onClick={() => setTab('data')}>
+              Site data
+            </button>
           </div>
           {tab === 'sections' ? (
             <>
@@ -222,6 +230,39 @@ export function Structure() {
                         >
                           <strong>{pattern.label}</strong>
                           <span>{pattern.description}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </>
+          ) : tab === 'data' ? (
+            <>
+              <p className="bbe-inserter__where">
+                Shows live content from WordPress{settings().hasStore ? ' and your store' : ''}.
+                Text and settings of these are managed in WordPress.
+              </p>
+              {DYNAMIC_GROUPS.map((group) => {
+                const items = DYNAMIC_BLOCKS.filter(
+                  (block) =>
+                    block.group === group &&
+                    (block.requires !== 'woocommerce' || settings().hasStore),
+                );
+                if (items.length === 0) return null;
+                return (
+                  <div key={group} className="bbe-inserter__group">
+                    <h3>{DYNAMIC_GROUP_LABELS[group]}</h3>
+                    <div className="bbe-inserter__patterns">
+                      {items.map((block) => (
+                        <button
+                          key={block.id}
+                          type="button"
+                          data-dynamic={block.id}
+                          onClick={() => insertDynamic(state, dispatch, block.id)}
+                        >
+                          <strong>{block.label}</strong>
+                          <span>{block.description}</span>
                         </button>
                       ))}
                     </div>

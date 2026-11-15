@@ -2,12 +2,21 @@ import apiFetch from '@wordpress/api-fetch';
 
 /** A page or post the editor can open. */
 export interface PostSummary {
-  id: number;
-  /** REST base of its type: "pages" or "posts". */
+  /** Post id, or a template id such as `bestenberg//single`. */
+  id: number | string;
+  /** REST base of its type: "pages", "posts", "templates" or "template-parts". */
   rest: string;
   title: string;
   status: string;
+  /** Public address ('' for templates and parts). */
   link: string;
+  /** Templates and parts: the file name without extension (`single-product`). */
+  slug?: string;
+}
+
+/** Templates and template parts are edited on a bare canvas and need the design capability. */
+export function isTemplate(post: Pick<PostSummary, 'rest'>): boolean {
+  return post.rest === 'templates' || post.rest === 'template-parts';
 }
 
 export interface LoadedPost extends PostSummary {
@@ -16,9 +25,10 @@ export interface LoadedPost extends PostSummary {
 }
 
 interface RestPost {
-  id: number;
+  id: number | string;
   status: string;
-  link: string;
+  link?: string;
+  slug?: string;
   title: { raw?: string; rendered: string };
   content?: { raw?: string };
 }
@@ -31,7 +41,8 @@ function summary(rest: string, post: RestPost): PostSummary {
     rest,
     title: post.title.raw ?? post.title.rendered,
     status: post.status,
-    link: post.link,
+    link: post.link ?? '',
+    ...(isTemplate({ rest }) && post.slug ? { slug: post.slug } : {}),
   };
 }
 
@@ -41,7 +52,7 @@ export function settings(): BestenbergEditorSettings {
   return value;
 }
 
-/** Pages first, then posts, most recently changed first. */
+/** Pages, posts (most recently changed first) and, for designers, templates and parts. */
 export async function listPosts(): Promise<PostSummary[]> {
   const fetchType = async (rest: string) => {
     const posts = await apiFetch<RestPost[]>({
@@ -49,18 +60,40 @@ export async function listPosts(): Promise<PostSummary[]> {
     });
     return posts.map((post) => summary(rest, post));
   };
-  const [pages, posts] = await Promise.all([fetchType('pages'), fetchType('posts')]);
-  return [...pages, ...posts];
+  const fetchTemplates = async (rest: string) => {
+    if (!settings().canDesign) return [];
+    try {
+      const templates = await apiFetch<RestPost[]>({
+        path: `/wp/v2/${rest}?context=edit&_fields=id,slug,status,title`,
+      });
+      return templates
+        .map((template) => summary(rest, template))
+        .sort((a, b) => a.title.localeCompare(b.title));
+    } catch {
+      return [];
+    }
+  };
+  const lists = await Promise.all([
+    fetchType('pages'),
+    fetchType('posts'),
+    fetchTemplates('templates'),
+    fetchTemplates('template-parts'),
+  ]);
+  return lists.flat();
 }
 
-export async function loadPost(rest: string, id: number): Promise<LoadedPost> {
+export async function loadPost(rest: string, id: number | string): Promise<LoadedPost> {
   const post = await apiFetch<RestPost>({
-    path: `/wp/v2/${rest}/${id}?context=edit&_fields=id,status,link,title,content`,
+    path: `/wp/v2/${rest}/${id}?context=edit&_fields=id,slug,status,link,title,content`,
   });
   return { ...summary(rest, post), content: post.content?.raw ?? '' };
 }
 
-export async function savePost(rest: string, id: number, content: string): Promise<LoadedPost> {
+export async function savePost(
+  rest: string,
+  id: number | string,
+  content: string,
+): Promise<LoadedPost> {
   const post = await apiFetch<RestPost>({
     path: `/wp/v2/${rest}/${id}?context=edit`,
     method: 'POST',
@@ -78,21 +111,39 @@ export async function createPage(title: string): Promise<LoadedPost> {
   return { ...summary('pages', post), content: '' };
 }
 
-/** HTML for block markup only WordPress can render (raw nodes). */
-export async function renderMarkup(markup: string): Promise<string> {
+/** The kind of content a template shows, so its blocks can be previewed with a real example. */
+export function samplePostType(slug: string | undefined): string {
+  if (!slug) return 'page';
+  if (slug === 'single-product') return 'product';
+  if (slug.startsWith('page')) return 'page';
+  if (slug.startsWith('single')) return 'post';
+  return '';
+}
+
+/**
+ * HTML for block markup only WordPress can render (raw nodes), shown for the
+ * post being edited or, in a template, for an example post of the right type.
+ */
+export async function renderMarkup(markup: string, post: PostSummary | null): Promise<string> {
+  const context =
+    post === null
+      ? {}
+      : isTemplate(post)
+        ? { postType: samplePostType(post.slug) }
+        : { postId: post.id };
   const { html } = await apiFetch<{ html: string }>({
     path: '/bestenberg/v1/render',
     method: 'POST',
-    data: { markup },
+    data: { markup, ...context },
   });
   return html;
 }
 
-/** URL of the editing canvas for a post. */
-export function canvasUrl(postId: number): string {
+/** URL of the editing canvas: the post's own page, or a bare page for templates and parts. */
+export function canvasUrl(post: PostSummary): string {
   const { homeUrl, canvasArg, canvasNonce } = settings();
   const url = new URL(homeUrl);
-  url.searchParams.set(canvasArg, String(postId));
+  url.searchParams.set(canvasArg, isTemplate(post) ? 'template' : String(post.id));
   url.searchParams.set('_wpnonce', canvasNonce);
   return url.toString();
 }
