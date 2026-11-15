@@ -5,6 +5,7 @@ import { Canvas } from './canvas/Canvas';
 import { Inspector } from './panels/Inspector';
 import { Structure } from './panels/Structure';
 import { TopBar } from './panels/TopBar';
+import { Welcome } from './panels/Welcome';
 import { StoreProvider, isDirty, useStore } from './store';
 
 function isTypingTarget(target: EventTarget | null): boolean {
@@ -74,8 +75,9 @@ function Editor() {
   }, [notice, dispatch]);
 
   return (
-    <div className="bestenberg-app" data-busy={state.busy ?? undefined}>
+    <div className="bestenberg-app" data-busy={state.busy ?? undefined} data-mode={state.mode}>
       <TopBar />
+      <Welcome />
       <div className="bbe-body">
         <Structure />
         <main className="bestenberg-app__canvas">

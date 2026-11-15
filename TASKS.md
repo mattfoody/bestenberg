@@ -124,3 +124,13 @@
 - [x] **7.6 Tests.** Theme documents (valid, round trip), PHPUnit for render context and the template canvas, e2e: guest purchase from product to order received, catalog, footer edited for the whole site, template opened from the picker.
 
 **Done when:** a designer can restyle header, footer and store templates in the editor and a visitor can complete a purchase.
+
+## M8 — Client mode
+
+- [x] **8.1 Locks.** `node.locked`: `content` (default: wording, pictures, links), `none` (direct children can also be duplicated, reordered, removed), `all` (nothing, inherited). `effectiveLock()`, `clientPermissions()`, `isClientControl()` in `@bestenberg/schema`.
+- [x] **8.2 Client mode in the editor.** Users without `edit_theme_options` get client mode; every edit goes through one permission check (`can()`); no inserter, no Generate, no styling; inspector shows content controls only; locked parts explain themselves.
+- [x] **8.3 Designer controls.** "Client editing" setting on every component; "Client view" switch to check the result.
+- [x] **8.4 Onboarding.** One-time introduction per mode, remembered per user (`POST bestenberg/v1/onboarding`).
+- [x] **8.5 Tests.** Unit tests for locks, PHPUnit for onboarding, e2e for client editing, designer locks and the introductions.
+
+**Done when:** a client can change content without being able to break the design.

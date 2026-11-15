@@ -1,6 +1,7 @@
 import { createContext, useContext, useMemo, useReducer } from '@wordpress/element';
 import type { Dispatch, ReactNode } from 'react';
 import {
+  clientPermissions,
   createHistory,
   findNode,
   pushHistory,
@@ -17,6 +18,10 @@ import type { LoadedPost, PostSummary } from './api';
 export type Viewport = 'mobile' | 'tablet' | 'desktop';
 /** Where style changes apply: every size, or the current viewport and larger. */
 export type Scope = 'all' | 'up';
+/** Design: everything. Client: wording, pictures and links; structure only where the designer allows. */
+export type Mode = 'design' | 'client';
+/** What an edit needs: `content` and `arrange` can be open to clients, `design` never is. */
+export type Permission = 'content' | 'arrange' | 'design';
 
 export const VIEWPORT_BREAKPOINT: Record<Viewport, Breakpoint> = {
   mobile: 'base',
@@ -37,6 +42,7 @@ export interface EditorState {
   selectedId: string | null;
   viewport: Viewport;
   scope: Scope;
+  mode: Mode;
   busy: 'loading' | 'saving' | null;
   notice: Notice | null;
   /** Sections the AI just added, waiting for the user to keep or discard them. */
@@ -54,6 +60,7 @@ export type Action =
   | { type: 'select'; id: string | null }
   | { type: 'viewport'; viewport: Viewport }
   | { type: 'scope'; scope: Scope }
+  | { type: 'mode'; mode: Mode }
   | { type: 'saving' }
   | { type: 'saved'; post: LoadedPost; doc: Doc }
   | { type: 'notice'; notice: Notice | null }
@@ -66,6 +73,7 @@ export const initialState: EditorState = {
   selectedId: null,
   viewport: 'desktop',
   scope: 'all',
+  mode: 'design',
   busy: null,
   notice: null,
   review: null,
@@ -129,6 +137,9 @@ export function reducer(state: EditorState, action: Action): EditorState {
       };
     case 'scope':
       return { ...state, scope: state.viewport === 'mobile' ? 'all' : action.scope };
+    case 'mode':
+      // Client mode has no per-size styling.
+      return { ...state, mode: action.mode, scope: action.mode === 'client' ? 'all' : state.scope };
     case 'saving':
       return { ...state, busy: 'saving', notice: null };
     case 'saved':
@@ -160,6 +171,14 @@ export function selectedNode(state: EditorState): Node | null {
   return doc && state.selectedId ? (findNode(doc.root, state.selectedId)?.node ?? null) : null;
 }
 
+/** Whether the current mode allows this kind of edit on a node (null = the page itself). */
+export function can(state: EditorState, id: string | null, permission: Permission): boolean {
+  if (state.mode === 'design') return true;
+  const doc = currentDoc(state);
+  if (permission === 'design' || id === null || !doc) return false;
+  return clientPermissions(doc, id)[permission];
+}
+
 export function isDirty(state: EditorState): boolean {
   return state.history !== null && state.history.present !== state.savedDoc;
 }
@@ -172,7 +191,10 @@ interface Store {
 const StoreContext = createContext<Store | null>(null);
 
 export function StoreProvider({ children }: { children: ReactNode }) {
-  const [state, dispatch] = useReducer(reducer, initialState);
+  const [state, dispatch] = useReducer(reducer, initialState, (initial) => ({
+    ...initial,
+    mode: window.bestenbergEditor?.canDesign === false ? ('client' as const) : initial.mode,
+  }));
   const store = useMemo(() => ({ state, dispatch }), [state]);
   return <StoreContext.Provider value={store}>{children}</StoreContext.Provider>;
 }

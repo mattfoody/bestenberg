@@ -40,7 +40,7 @@ const boxControls = (layout: Parameters<typeof layoutControls>[0]) => [
   ...spacingControls(),
   ...colorControls({ image: true }),
   ...effectsControls(),
-  ...visibilityControls(),
+  ...visibilityControls({ arrange: true }),
 ];
 
 const tagControl = (tags: readonly string[]): ControlDef => ({
@@ -272,7 +272,7 @@ export const list = defineComponent({
     ...typographyControls(),
     ...colorControls({ background: false }),
     ...marginControls(),
-    ...visibilityControls(),
+    ...visibilityControls({ arrange: true }),
   ],
   defaults: { props: { ordered: false }, children: ['list-item'] },
   ai: { description: 'Bulleted or numbered list of list-item children.' },
@@ -305,7 +305,7 @@ export const buttonGroup = defineComponent({
   controls: [
     ...layoutControls({ display: false, columns: false, wrap: false }),
     ...marginControls(),
-    ...visibilityControls(),
+    ...visibilityControls({ arrange: true }),
   ],
   defaults: { props: {}, children: ['button'] },
   ai: { description: 'Row of buttons. Buttons must be inside a button group.' },
@@ -418,7 +418,7 @@ export const quote = defineComponent({
     ...colorControls({ background: false }),
     ...spacingControls(),
     ...effectsControls().filter((c) => c.id.startsWith('border.')),
-    ...visibilityControls(),
+    ...visibilityControls({ arrange: true }),
   ],
   defaults: { props: {}, children: ['text'] },
   ai: { description: 'Quotation made of text children, with an optional citation.' },

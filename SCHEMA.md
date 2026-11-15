@@ -37,7 +37,7 @@ type Node = {
   style?: Responsive<Style>;     // token refs only
   children?: Node[];             // only if component allows children
   bind?: Binding;                // dynamic data (query, Woo product fields)
-  locked?: "none" | "content" | "all"; // client mode
+  locked?: "none" | "content" | "all"; // client mode: content (default) = text/images/links; none = direct children can also be duplicated, moved, removed; all = nothing (inherited)
   hidden?: Partial<Record<Breakpoint, boolean>>;
 };
 
@@ -106,7 +106,7 @@ Commerce and data types wrap Woo/core blocks; layout types are Bestenberg dynami
 ```ts
 type ControlDef = {
   id: string;
-  group: "content" | "layout" | "spacing" | "typography" | "color" | "effects" | "visibility" | "data";
+  group: "content" | "layout" | "spacing" | "typography" | "color" | "effects" | "visibility" | "access" | "data";
   label: string;
   kind: "token" | "segmented" | "toggle" | "text" | "richtext" | "media" | "link"
       | "select" | "columns" | "binding" | "query";

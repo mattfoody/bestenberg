@@ -287,7 +287,14 @@ export function effectsControls({ aspect = false }: { aspect?: boolean } = {}): 
   return list;
 }
 
-export function visibilityControls(): ControlDef[] {
+export interface VisibilityControlOptions {
+  /** The component holds items a client may be allowed to add, reorder and remove. */
+  arrange?: boolean;
+}
+
+export function visibilityControls({
+  arrange = false,
+}: VisibilityControlOptions = {}): ControlDef[] {
   return [
     {
       id: 'hidden.base',
@@ -309,6 +316,18 @@ export function visibilityControls(): ControlDef[] {
       label: 'Hide on desktop',
       kind: 'toggle',
       path: 'hidden.desktop',
+    },
+    {
+      id: 'locked',
+      group: 'access',
+      label: 'People who edit content can',
+      kind: 'select',
+      path: 'locked',
+      defaultLabel: 'Change text, images and links',
+      options: [
+        ...(arrange ? [{ value: 'none', label: 'Also add, reorder and remove items inside' }] : []),
+        { value: 'all', label: 'Change nothing here' },
+      ],
     },
   ];
 }

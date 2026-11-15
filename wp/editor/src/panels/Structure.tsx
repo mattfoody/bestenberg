@@ -13,7 +13,7 @@ import {
 } from '@bestenberg/schema';
 import { insert, insertDynamic, insertPattern, move, registry } from '../actions';
 import { settings } from '../api';
-import { currentDoc, useStore } from '../store';
+import { can, currentDoc, useStore } from '../store';
 
 type DropPosition = 'before' | 'inside' | 'after';
 
@@ -126,7 +126,7 @@ export function Structure() {
         <div
           className={classes.join(' ')}
           style={{ paddingLeft: 8 + depth * 14 }}
-          draggable
+          draggable={can(state, node.id, 'arrange')}
           onDragStart={(event) => {
             event.dataTransfer.setData(DRAG_TYPE, node.id);
             event.dataTransfer.effectAllowed = 'move';
@@ -169,6 +169,7 @@ export function Structure() {
     );
   };
 
+  const designing = state.mode === 'design';
   const selected = state.selectedId ? findNode(doc.root, state.selectedId)?.node : null;
   const choices = registry
     .list()
@@ -179,16 +180,18 @@ export function Structure() {
     <aside className="bbe-panel bbe-structure" aria-label="Page structure">
       <div className="bbe-panel__head">
         <h2>Structure</h2>
-        <button
-          type="button"
-          className="bbe-button bbe-button--small"
-          aria-expanded={adding}
-          onClick={() => setAdding(!adding)}
-        >
-          {adding ? 'Close' : 'Add'}
-        </button>
+        {designing && (
+          <button
+            type="button"
+            className="bbe-button bbe-button--small"
+            aria-expanded={adding}
+            onClick={() => setAdding(!adding)}
+          >
+            {adding ? 'Close' : 'Add'}
+          </button>
+        )}
       </div>
-      {adding && (
+      {adding && designing && (
         <div className="bbe-inserter">
           <div className="bbe-segmented" role="group" aria-label="What to add">
             <button
@@ -302,7 +305,9 @@ export function Structure() {
       )}
       {doc.root.length === 0 ? (
         <p className="bbe-panel__empty">
-          Nothing here yet. Choose Add to start with a ready-made section.
+          {designing
+            ? 'Nothing here yet. Choose Add to start with a ready-made section.'
+            : 'This page is empty. The person who designs the site can add sections to it.'}
         </p>
       ) : (
         <ul className="bbe-tree" role="tree" aria-label="Page structure">

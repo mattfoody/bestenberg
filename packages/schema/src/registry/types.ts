@@ -12,6 +12,7 @@ export const CONTROL_GROUPS = [
   'color',
   'effects',
   'visibility',
+  'access',
   'data',
 ] as const;
 export type ControlGroup = (typeof CONTROL_GROUPS)[number];
@@ -44,6 +45,8 @@ export interface ControlDef {
   path: string;
   token?: TokenCategory;
   options?: readonly ControlOption[];
+  /** Select controls: label of the unset choice (defaults to "Default"). */
+  defaultLabel?: string;
   /** Writes to `style[breakpoint]` instead of `style.base`. */
   responsive?: boolean;
   showIf?: (node: Node) => boolean;

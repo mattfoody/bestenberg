@@ -1,6 +1,7 @@
 # Changelog
 
 ## Unreleased
+- M8: client mode — people who edit content change text, images and links only; designers decide per component whether items can be added/reordered/removed or nothing can change; "Client view" preview; one-time introductions.
 - M7: templates, header and footer are editable in the Bestenberg editor; "Site data" inserter for menu, search, post and store blocks; WooCommerce product, catalog, cart, checkout and order confirmation templates.
 - M6: screenshot → page in the Generate dialog; `pnpm eval` harness scoring generated pages against fixtures (visual + structure).
 - M5: Generate with AI — describe a page or section (optionally with a screenshot) and get editable sections built from the site's tokens and components; output is validated, repaired up to three times, and kept or discarded by the user. Uses the provider connected under Settings → Connectors. `bestenberg/get-design-system` ability for AI agents.

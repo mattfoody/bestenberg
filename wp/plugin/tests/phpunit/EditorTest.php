@@ -12,6 +12,7 @@ namespace Bestenberg\Tests\phpunit;
 use Bestenberg\Admin\EditorPage;
 use Bestenberg\Blocks\LayoutBlocks;
 use Bestenberg\Editor\Canvas;
+use Bestenberg\Rest\OnboardingController;
 use WP_REST_Request;
 use WP_UnitTestCase;
 
@@ -158,6 +159,35 @@ final class EditorTest extends WP_UnitTestCase {
 		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
 		$this->go_to( Canvas::template_url() );
 		$this->assertContains( 'bb-canvas', get_body_class() );
+	}
+
+	public function test_onboarding_is_remembered_per_user_and_mode(): void {
+		$user_id = self::factory()->user->create( array( 'role' => 'editor' ) );
+		wp_set_current_user( $user_id );
+		$this->assertSame( array(), OnboardingController::seen( $user_id ) );
+
+		$request = new WP_REST_Request( 'POST', '/bestenberg/v1/onboarding' );
+		$request->set_param( 'mode', 'client' );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertSame( array( 'client' ), $response->get_data()['onboarded'] );
+		$this->assertSame( array( 'client' ), OnboardingController::seen( $user_id ) );
+
+		// Repeating changes nothing; unknown modes are rejected.
+		rest_get_server()->dispatch( $request );
+		$this->assertSame( array( 'client' ), OnboardingController::seen( $user_id ) );
+		$request->set_param( 'mode', 'admin' );
+		$this->assertSame( 400, rest_get_server()->dispatch( $request )->get_status() );
+
+		$other = self::factory()->user->create( array( 'role' => 'editor' ) );
+		$this->assertSame( array(), OnboardingController::seen( $other ) );
+	}
+
+	public function test_onboarding_requires_an_editor(): void {
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'subscriber' ) ) );
+		$request = new WP_REST_Request( 'POST', '/bestenberg/v1/onboarding' );
+		$request->set_param( 'mode', 'client' );
+		$this->assertSame( 403, rest_get_server()->dispatch( $request )->get_status() );
 	}
 
 	public function test_editor_url_opens_a_post(): void {

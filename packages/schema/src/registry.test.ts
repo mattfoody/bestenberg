@@ -28,6 +28,8 @@ function pathProblem(def: ComponentDef, control: ControlDef): string | undefined
         : `bad hidden key ${key}`;
     case 'bind':
       return undefined;
+    case 'locked':
+      return key === undefined ? undefined : `bad locked path ${control.path}`;
     default:
       return `unknown path root ${root}`;
   }

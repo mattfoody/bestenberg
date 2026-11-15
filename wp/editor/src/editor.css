@@ -812,3 +812,25 @@ html.wp-toolbar:has(body.bestenberg-fullscreen) {
   transform: translateX(-50%);
   white-space: nowrap;
 }
+
+/* ── Client mode and introduction ────────────────────────────────────────── */
+
+.bbe-button[aria-pressed='true'] {
+  border-color: var(--bbe-select);
+  color: var(--bbe-select);
+}
+
+.bbe-welcome-dialog ul {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.bbe-welcome-dialog li {
+  padding-left: 14px;
+  border-left: 2px solid var(--bbe-select);
+}

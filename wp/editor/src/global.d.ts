@@ -51,6 +51,8 @@ interface BestenbergEditorSettings {
   theme: string;
   /** Whether WooCommerce is active. */
   hasStore: boolean;
+  /** Modes (`design`, `client`) whose introduction this user has already seen. */
+  onboarded: string[];
 }
 
 interface WpMediaAttachment {

@@ -142,7 +142,7 @@ export function TopBar() {
             </button>
           ))}
         </div>
-        {state.viewport !== 'mobile' && (
+        {state.viewport !== 'mobile' && state.mode === 'design' && (
           <select
             aria-label="Style changes apply to"
             value={state.scope}
@@ -177,14 +177,29 @@ export function TopBar() {
             )}
           </span>
         )}
-        <button
-          type="button"
-          className="bbe-button"
-          disabled={!state.post || state.busy !== null}
-          onClick={() => setGenerating(true)}
-        >
-          Generate
-        </button>
+        {settings().canDesign && (
+          <button
+            type="button"
+            className="bbe-button bbe-button--quiet"
+            aria-pressed={state.mode === 'client'}
+            title="See the editor as someone who only edits content"
+            onClick={() =>
+              dispatch({ type: 'mode', mode: state.mode === 'client' ? 'design' : 'client' })
+            }
+          >
+            Client view
+          </button>
+        )}
+        {state.mode === 'design' && (
+          <button
+            type="button"
+            className="bbe-button"
+            disabled={!state.post || state.busy !== null}
+            onClick={() => setGenerating(true)}
+          >
+            Generate
+          </button>
+        )}
         <button
           type="button"
           className="bbe-button bbe-button--quiet"

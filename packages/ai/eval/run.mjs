@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* global Image, document -- used inside page.evaluate(), which runs in the browser. */
 /**
  * Screenshot eval harness (PLAN.md §6):
  *   fixture page → reference screenshot → model (screenshot → sections)

@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: Bestenberg e2e helpers
- * Description: Scripted AI answers for end-to-end tests. Only active for requests that send the X-Bestenberg-E2E header.
+ * Description: Scripted AI answers and onboarding reset for end-to-end tests. Only active for requests that send the X-Bestenberg-E2E header.
  *
  * @package Bestenberg
  */
@@ -10,6 +10,16 @@ declare( strict_types=1 );
 
 if ( ! isset( $_SERVER['HTTP_X_BESTENBERG_E2E'] ) ) {
 	return;
+}
+
+// "reset-onboarding": the current user has not seen the editor introductions yet.
+if ( 'reset-onboarding' === $_SERVER['HTTP_X_BESTENBERG_E2E'] ) {
+	add_action(
+		'init',
+		static function (): void {
+			delete_user_meta( get_current_user_id(), 'bestenberg_onboarded' );
+		}
+	);
 }
 
 add_filter( 'bestenberg_ai_available', '__return_true' );

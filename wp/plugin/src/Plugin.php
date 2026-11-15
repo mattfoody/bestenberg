@@ -15,6 +15,7 @@ use Bestenberg\Ai\AiController;
 use Bestenberg\Blocks\CoreBlockStyles;
 use Bestenberg\Blocks\LayoutBlocks;
 use Bestenberg\Editor\Canvas;
+use Bestenberg\Rest\OnboardingController;
 use Bestenberg\Rest\RenderController;
 use Bestenberg\Styles\Collector;
 use Bestenberg\Styles\StyleClasses;
@@ -77,6 +78,7 @@ final class Plugin {
 		( new CoreBlockStyles( $config['core'], $style_classes, $this->collector() ) )->register();
 		( new Canvas() )->register();
 		( new RenderController() )->register();
+		( new OnboardingController() )->register();
 		( new AiController() )->register();
 		( new Abilities() )->register();
 		Updater::from_plugin_header()?->register();

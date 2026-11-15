@@ -10,6 +10,7 @@ declare( strict_types=1 );
 namespace Bestenberg\Admin;
 
 use Bestenberg\Editor\Canvas;
+use Bestenberg\Rest\OnboardingController;
 
 /**
  * Registers the "Bestenberg" admin page and mounts the React editor app.
@@ -192,6 +193,7 @@ final class EditorPage {
 			'canDesign'   => current_user_can( 'edit_theme_options' ),
 			'theme'       => get_stylesheet(),
 			'hasStore'    => class_exists( 'WooCommerce' ),
+			'onboarded'   => OnboardingController::seen( get_current_user_id() ),
 		);
 	}
 

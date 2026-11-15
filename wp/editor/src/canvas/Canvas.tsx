@@ -11,7 +11,7 @@ import {
 } from '@bestenberg/schema';
 import { duplicate, nudge, registry, remove } from '../actions';
 import { canvasUrl, renderMarkup, settings } from '../api';
-import { currentDoc, useStore, type EditorState, type Viewport } from '../store';
+import { can, currentDoc, useStore, type EditorState, type Viewport } from '../store';
 
 const VIEWPORT_WIDTH: Record<Viewport, string> = {
   mobile: '390px',
@@ -121,7 +121,7 @@ export function Canvas({ onShortcut }: Props) {
       const owner = element.closest<HTMLElement>('[data-bb-id]');
       const id = owner?.getAttribute('data-bb-id');
       const prop = element.getAttribute('data-bb-text');
-      if (!id || !prop) return;
+      if (!id || !prop || !can(stateRef.current, id, 'content')) return;
       if (editing.current?.element === element) return;
       stopEditing();
       editing.current = { element, id, prop, committed: false };
@@ -294,6 +294,7 @@ export function Canvas({ onShortcut }: Props) {
   const selected = doc && selectedId ? findNode(doc.root, selectedId) : null;
   const label = selected ? (registry.get(selected.node.type)?.label ?? selected.node.type) : '';
   const siblings = selected ? (selected.parent?.children ?? doc!.root).length : 0;
+  const mayArrange = selected !== null && can(state, selected.node.id, 'arrange');
   const format = (command: 'bold' | 'italic') => frameDocument()?.execCommand(command);
 
   const startLink = () => {
@@ -425,7 +426,7 @@ export function Canvas({ onShortcut }: Props) {
                 <u>A</u>
               </button>
             </>
-          ) : (
+          ) : !mayArrange ? null : (
             <>
               <button
                 type="button"

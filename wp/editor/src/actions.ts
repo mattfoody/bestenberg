@@ -17,7 +17,7 @@ import {
   type Doc,
 } from '@bestenberg/schema';
 import { errorMessage, loadPost, savePost, type LoadedPost } from './api';
-import { currentDoc, targetBreakpoint, type Action, type EditorState } from './store';
+import { can, currentDoc, targetBreakpoint, type Action, type EditorState } from './store';
 
 export { registry };
 
@@ -76,7 +76,7 @@ export async function save(state: EditorState, dispatch: Dispatch<Action>): Prom
 /** Adds a new component relative to the selection. Returns false if it has no place. */
 export function insert(state: EditorState, dispatch: Dispatch<Action>, type: string): boolean {
   const doc = currentDoc(state);
-  if (!doc) return false;
+  if (!doc || !can(state, null, 'design')) return false;
   const place = insertPlacement(doc, registry, state.selectedId, type);
   if (!place) return false;
   const node = createNode(registry, type);
@@ -92,7 +92,7 @@ export function insert(state: EditorState, dispatch: Dispatch<Action>, type: str
 export function insertDynamic(state: EditorState, dispatch: Dispatch<Action>, id: string): boolean {
   const doc = currentDoc(state);
   const block = getDynamicBlock(id);
-  if (!doc || !block) return false;
+  if (!doc || !block || !can(state, null, 'design')) return false;
   const place = insertPlacement(doc, registry, state.selectedId, 'raw');
   if (!place) return false;
   const node = rawNode(block.markup);
@@ -106,14 +106,14 @@ export function insertDynamic(state: EditorState, dispatch: Dispatch<Action>, id
 
 export function remove(state: EditorState, dispatch: Dispatch<Action>, id: string): void {
   const doc = currentDoc(state);
-  if (!doc) return;
+  if (!doc || !can(state, id, 'arrange')) return;
   const parent = findNode(doc.root, id)?.parent ?? null;
   dispatch({ type: 'commit', doc: removeNode(doc, id), select: parent?.id ?? null });
 }
 
 export function duplicate(state: EditorState, dispatch: Dispatch<Action>, id: string): void {
   const doc = currentDoc(state);
-  if (!doc) return;
+  if (!doc || !can(state, id, 'arrange')) return;
   const result = duplicateNode(doc, id);
   if (result.id) dispatch({ type: 'commit', doc: result.doc, select: result.id });
 }
@@ -126,7 +126,11 @@ export function move(
   index: number,
 ): void {
   const doc = currentDoc(state);
-  if (doc) dispatch({ type: 'commit', doc: moveNode(doc, registry, id, parentId, index) });
+  if (!doc || !can(state, id, 'arrange')) return;
+  // Clients reorder within a group; they do not move things to other places.
+  const current = findNode(doc.root, id)?.parent?.id ?? null;
+  if (state.mode === 'client' && parentId !== current) return;
+  dispatch({ type: 'commit', doc: moveNode(doc, registry, id, parentId, index) });
 }
 
 /** Moves a node one step earlier (-1) or later (+1) among its siblings. */
@@ -152,7 +156,7 @@ export function setControl(
   value: unknown,
 ): void {
   const doc = currentDoc(state);
-  if (!doc) return;
+  if (!doc || !can(state, id, 'design')) return;
   const breakpoint = targetBreakpoint(state);
   dispatch({
     type: 'commit',
@@ -164,7 +168,7 @@ export function setControl(
 export function insertPattern(state: EditorState, dispatch: Dispatch<Action>, id: string): boolean {
   const doc = currentDoc(state);
   const pattern = getPattern(id);
-  if (!doc || !pattern) return false;
+  if (!doc || !pattern || !can(state, null, 'design')) return false;
   const selected = state.selectedId ? findNode(doc.root, state.selectedId) : null;
   const topId = selected ? (selected.ancestors[0] ?? selected.node.id) : null;
   const after = topId ? doc.root.findIndex((node) => node.id === topId) : -1;

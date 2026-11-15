@@ -10,6 +10,7 @@ export * from './rich-text';
 export * from './samples';
 export * from './validate';
 export * from './ops';
+export * from './lock';
 export * from './library';
 export * from './registry/types';
 export * from './registry/registry';

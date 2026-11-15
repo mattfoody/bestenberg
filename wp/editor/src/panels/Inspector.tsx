@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from '@wordpress/element';
 import {
   CONTROL_GROUPS,
   getControlValue,
+  isClientControl,
   isSafeUrl,
   resolveControlValue,
   setControlValue,
@@ -15,6 +16,7 @@ import { GRID_COLUMNS, tokens, type TokenCategory } from '@bestenberg/tokens';
 import { registry } from '../actions';
 import {
   VIEWPORT_BREAKPOINT,
+  can,
   currentDoc,
   selectedNode,
   targetBreakpoint,
@@ -29,6 +31,7 @@ const GROUP_LABEL: Record<ControlGroup, string> = {
   color: 'Colour',
   effects: 'Border and shadow',
   visibility: 'Visibility',
+  access: 'Client editing',
   data: 'Data',
 };
 
@@ -88,7 +91,7 @@ function TokenField({ control, value, onChange }: FieldProps) {
       value={current}
       onChange={(event) => onChange(event.target.value === '' ? undefined : event.target.value)}
     >
-      <option value="">Default</option>
+      <option value="">{control.defaultLabel ?? 'Default'}</option>
       {names.map((name) => (
         <option key={name} value={`${category}.${name}`}>
           {tokenLabel(category, name)}
@@ -317,14 +320,20 @@ export function Inspector() {
   const def = registry.get(node.type);
   const viewBreakpoint = VIEWPORT_BREAKPOINT[state.viewport];
   const writeBreakpoint = targetBreakpoint(state);
+  const client = state.mode === 'client';
+  const editable = can(state, node.id, 'content');
   const controls = (def?.controls ?? []).filter(
-    (control) => fieldFor(control) !== null && (control.showIf?.(node) ?? true),
+    (control) =>
+      fieldFor(control) !== null &&
+      (control.showIf?.(node) ?? true) &&
+      (!client || (editable && isClientControl(control))),
   );
-  const hasInlineText = (def?.controls ?? []).some((control) => control.kind === 'richtext');
+  const hasInlineText =
+    editable && (def?.controls ?? []).some((control) => control.kind === 'richtext');
 
   const write = (control: ControlDef, value: unknown, isTyping = false) => {
     const doc = currentDoc(state);
-    if (!doc) return;
+    if (!doc || (client && !(editable && isClientControl(control)))) return;
     const next = updateNode(doc, node.id, (current) => {
       if (control.kind === 'media')
         return applyImage(current, control, value as PickedImage | null);
@@ -340,10 +349,26 @@ export function Inspector() {
       <div className="bbe-panel__head">
         <h2>{def?.label ?? node.type}</h2>
       </div>
-      {node.type === 'raw' && (
+      {node.type === 'raw' && !client && (
         <p className="bbe-panel__empty">
           This block comes from WordPress or another plugin. Bestenberg keeps it exactly as it is;
           you can move or delete it here and edit it in the WordPress editor.
+        </p>
+      )}
+      {client && !editable && (
+        <p className="bbe-panel__empty">
+          This part is locked. Ask the person who designs the site to change it.
+        </p>
+      )}
+      {client && editable && node.type === 'raw' && (
+        <p className="bbe-panel__empty">
+          This shows live content from WordPress, such as a menu or a list of posts. It is managed
+          in WordPress.
+        </p>
+      )}
+      {client && editable && node.type !== 'raw' && controls.length === 0 && !hasInlineText && (
+        <p className="bbe-panel__empty">
+          Nothing to change here. Select a text, an image or a button.
         </p>
       )}
       {hasInlineText && (

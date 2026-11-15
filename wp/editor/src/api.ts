@@ -139,6 +139,11 @@ export async function renderMarkup(markup: string, post: PostSummary | null): Pr
   return html;
 }
 
+/** Remembers that this user has seen the introduction for a mode. */
+export async function markOnboarded(mode: string): Promise<void> {
+  await apiFetch({ path: '/bestenberg/v1/onboarding', method: 'POST', data: { mode } });
+}
+
 /** URL of the editing canvas: the post's own page, or a bare page for templates and parts. */
 export function canvasUrl(post: PostSummary): string {
   const { homeUrl, canvasArg, canvasNonce } = settings();
