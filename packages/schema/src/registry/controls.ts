@@ -190,7 +190,10 @@ export function typographyControls(): ControlDef[] {
   ];
 }
 
-export function colorControls({ background = true }: { background?: boolean } = {}): ControlDef[] {
+export function colorControls({
+  background = true,
+  image = false,
+}: { background?: boolean; image?: boolean } = {}): ControlDef[] {
   const list: ControlDef[] = [
     {
       id: 'color',
@@ -211,6 +214,26 @@ export function colorControls({ background = true }: { background?: boolean } = 
       path: 'style.background',
       quick: true,
     });
+  }
+  if (background && image) {
+    list.push(
+      {
+        id: 'background.image',
+        group: 'color',
+        label: 'Background image',
+        kind: 'media',
+        path: 'style.background',
+      },
+      {
+        id: 'background.overlay',
+        group: 'color',
+        label: 'Image overlay',
+        kind: 'token',
+        token: 'color',
+        path: 'style.background.overlay',
+        showIf: (node: Node) => typeof node.style?.base?.background === 'object',
+      },
+    );
   }
   return list;
 }

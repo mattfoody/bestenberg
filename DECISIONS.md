@@ -39,4 +39,5 @@ Log of non-obvious choices. Newest at the bottom. Format: date — decision — 
 - 2026-11-15 — The editor uses only `@wordpress/element`, `@wordpress/api-fetch` and `wp.media`; no `@wordpress/components`. — Own UI, small bundle, fewer moving parts across WordPress releases.
 - 2026-11-15 — Rich-text controls are not shown in the inspector; text is edited on the canvas. — One obvious place to edit text; no HTML source shown to customers.
 - 2026-11-15 — `bin/wp-sqlite.sh` runs WordPress from GitHub with SQLite for environments without Docker. — Lets the editor be developed and e2e-tested where wp-env cannot run; CI still uses wp-env.
+- 2026-11-15 — Library sections are functions that build schema nodes (`PATTERNS` in `@bestenberg/schema`), not stored block markup or WordPress block patterns. — WP-agnostic, validated by the same schema as everything else, fresh ids per insert, and directly usable as AI examples.
 

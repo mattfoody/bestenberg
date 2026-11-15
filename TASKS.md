@@ -75,3 +75,16 @@
 - [x] **3.9 Tests.** Unit tests for ops and renderer; PHPUnit for canvas access and render endpoint; e2e: build, style, save, frontend, reload.
 
 **Done when:** a page can be opened, edited on the canvas and in the inspector, saved as native blocks, and renders identically on the frontend.
+
+---
+
+## M4 — Responsive + library
+
+- [x] **4.1 Breakpoint overrides.** Preview sizes with "all sizes" / "this size and up" scope; controls show the value in effect, where it is inherited from, and reset an override.
+- [x] **4.2 Section library.** `packages/schema/src/library.ts`: hero, features, content, testimonials, pricing and call-to-action sections as schema nodes; validated in unit tests; inserted from the Sections tab.
+- [x] **4.3 Links in text.** Link button while editing text: add, change and remove links (safe URLs only).
+- [x] **4.4 Background image.** Media-library background image with colour overlay on layout components.
+- [x] **4.5 Tests.** e2e: insert sections, link text, inherited values, frontend output.
+
+**Done when:** overrides can be set per size and sections can be inserted from the library.
+

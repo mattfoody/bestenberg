@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import { renderNodes } from '@bestenberg/adapter-blocks';
 import {
   findNode,
+  isSafeUrl,
   sanitizeRichText,
   setControlValue,
   updateNode,
@@ -61,6 +62,9 @@ export function Canvas({ onShortcut }: Props) {
   const [loaded, setLoaded] = useState(0);
   const [isEditing, setIsEditing] = useState(false);
   const [box, setBox] = useState<Box | null>(null);
+  /** Link being added or changed in the text being edited (null = not linking). */
+  const [link, setLink] = useState<{ url: string; existing: boolean } | null>(null);
+  const linking = useRef<{ range: Range; anchor: HTMLAnchorElement | null } | null>(null);
 
   const doc = currentDoc(state);
   const postId = state.post?.id ?? null;
@@ -104,6 +108,8 @@ export function Canvas({ onShortcut }: Props) {
     const current = editing.current;
     if (!current) return;
     editing.current = null;
+    linking.current = null;
+    setLink(null);
     current.element.removeAttribute('contenteditable');
     setIsEditing(false);
     // Re-render so the DOM matches the sanitized document again.
@@ -195,6 +201,8 @@ export function Canvas({ onShortcut }: Props) {
     document.addEventListener('mouseleave', () => setHover(null));
     document.addEventListener('input', onInput);
     document.addEventListener('focusout', (event) => {
+      // Focus moves to the link field in the toolbar while a link is being edited.
+      if (linking.current) return;
       if (editing.current && event.target === editing.current.element) stopEditing();
     });
     document.addEventListener('paste', (event) => {
@@ -285,8 +293,50 @@ export function Canvas({ onShortcut }: Props) {
   const label = selected ? (registry.get(selected.node.type)?.label ?? selected.node.type) : '';
   const siblings = selected ? (selected.parent?.children ?? doc!.root).length : 0;
   const format = (command: 'bold' | 'italic') => frameDocument()?.execCommand(command);
+
+  const startLink = () => {
+    const selection = frameDocument()?.getSelection();
+    const current = editing.current;
+    if (!selection || selection.rangeCount === 0 || !current) return;
+    const range = selection.getRangeAt(0);
+    const start = range.startContainer;
+    const anchor = (start instanceof Element ? start : start.parentElement)?.closest('a') ?? null;
+    if (range.collapsed && !anchor) {
+      dispatch({
+        type: 'notice',
+        notice: { kind: 'info', text: 'Select the words to link first.' },
+      });
+      return;
+    }
+    linking.current = { range: range.cloneRange(), anchor };
+    setLink({ url: anchor?.getAttribute('href') ?? '', existing: anchor !== null });
+  };
+
+  /** Puts focus and the saved selection back in the text, then runs a link command. */
+  const finishLink = (url: string | null) => {
+    const saved = linking.current;
+    const current = editing.current;
+    const document = frameDocument();
+    linking.current = null;
+    setLink(null);
+    if (!saved || !current || !document) return;
+    current.element.focus();
+    const selection = document.getSelection();
+    if (!selection) return;
+    const range = saved.range;
+    if (saved.anchor) range.selectNodeContents(saved.anchor);
+    selection.removeAllRanges();
+    selection.addRange(range);
+    if (url === null) return;
+    if (url === '') document.execCommand('unlink');
+    else document.execCommand('createLink', false, url);
+  };
+  const linkUrl = link?.url.trim() ?? '';
+  const linkValid = linkUrl !== '' && isSafeUrl(linkUrl);
   // Keep focus (and the text selection) in the canvas when a toolbar button is pressed.
-  const keepFocus = (event: { preventDefault(): void }) => event.preventDefault();
+  const keepFocus = (event: { target: EventTarget; preventDefault(): void }) => {
+    if (!(event.target instanceof HTMLInputElement)) event.preventDefault();
+  };
 
   if (postId === null) return <div className="bbe-canvas" ref={wrapper} />;
 
@@ -310,7 +360,53 @@ export function Canvas({ onShortcut }: Props) {
           onMouseDown={keepFocus}
         >
           <span className="bbe-toolbar__label">{label}</span>
-          {isEditing ? (
+          {isEditing && link ? (
+            <form
+              className="bbe-toolbar__link"
+              onSubmit={(event) => {
+                event.preventDefault();
+                if (linkValid) finishLink(linkUrl);
+              }}
+            >
+              <input
+                type="text"
+                aria-label="Link address"
+                placeholder="https://… or /page"
+                value={link.url}
+                autoFocus
+                onChange={(event) => setLink({ ...link, url: event.target.value })}
+                onKeyDown={(event) => {
+                  if (event.key === 'Escape') finishLink(null);
+                }}
+              />
+              <button
+                type="submit"
+                disabled={!linkValid}
+                aria-label="Apply link"
+                title="Apply link"
+              >
+                ✓
+              </button>
+              {link.existing && (
+                <button
+                  type="button"
+                  onClick={() => finishLink('')}
+                  aria-label="Remove link"
+                  title="Remove link"
+                >
+                  ⌫
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => finishLink(null)}
+                aria-label="Cancel"
+                title="Cancel"
+              >
+                ✕
+              </button>
+            </form>
+          ) : isEditing ? (
             <>
               <button type="button" onClick={() => format('bold')} aria-label="Bold" title="Bold">
                 <strong>B</strong>
@@ -322,6 +418,9 @@ export function Canvas({ onShortcut }: Props) {
                 title="Italic"
               >
                 <em>I</em>
+              </button>
+              <button type="button" onClick={startLink} aria-label="Link" title="Link">
+                <u>A</u>
               </button>
             </>
           ) : (

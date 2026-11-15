@@ -5,6 +5,7 @@ import {
   defaultRegistry as registry,
   duplicateNode,
   findNode,
+  getPattern,
   insertNode,
   insertPlacement,
   moveNode,
@@ -134,4 +135,19 @@ export function setControl(
     type: 'commit',
     doc: updateNode(doc, id, (node) => setControlValue(node, control, value, breakpoint)),
   });
+}
+
+/** Adds a library section after the top-level section that holds the selection (or at the end). */
+export function insertPattern(state: EditorState, dispatch: Dispatch<Action>, id: string): boolean {
+  const doc = currentDoc(state);
+  const pattern = getPattern(id);
+  if (!doc || !pattern) return false;
+  const selected = state.selectedId ? findNode(doc.root, state.selectedId) : null;
+  const topId = selected ? (selected.ancestors[0] ?? selected.node.id) : null;
+  const after = topId ? doc.root.findIndex((node) => node.id === topId) : -1;
+  const index = after === -1 ? doc.root.length : after + 1;
+  const nodes = pattern.build();
+  const root = [...doc.root.slice(0, index), ...nodes, ...doc.root.slice(index)];
+  dispatch({ type: 'commit', doc: { ...doc, root }, select: nodes[0]?.id ?? null });
+  return true;
 }

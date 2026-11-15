@@ -50,7 +50,8 @@ function mapNodes(nodes: Node[], id: string, fn: (node: Node) => Node | null): N
       const children = mapNodes(node.children, id, fn);
       if (children !== node.children) {
         changed = true;
-        const { children: _dropped, ...rest } = node;
+        const rest: Node = { ...node };
+        delete rest.children;
         out.push(children.length > 0 ? { ...rest, children } : rest);
         continue;
       }

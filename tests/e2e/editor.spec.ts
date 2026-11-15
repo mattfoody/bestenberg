@@ -14,7 +14,7 @@ interface CreatedPage {
   link: string;
 }
 
-let created: CreatedPage | null = null;
+const pages: CreatedPage[] = [];
 
 async function createPage(page: Page): Promise<CreatedPage> {
   await page.goto('/wp-admin/admin.php?page=bestenberg');
@@ -30,16 +30,20 @@ async function createPage(page: Page): Promise<CreatedPage> {
 
 test.describe('M3 editor', () => {
   test.afterAll(async ({ browser }) => {
-    if (!created) return;
+    if (pages.length === 0) return;
     const page = await browser.newPage();
     await page.goto('/wp-admin/admin.php?page=bestenberg');
     await page.evaluate(
-      (id) =>
-        (window as unknown as { wp: Wp }).wp.apiFetch({
-          path: `/wp/v2/pages/${id}?force=true`,
-          method: 'DELETE',
-        }),
-      created.id,
+      (ids) =>
+        Promise.all(
+          ids.map((id) =>
+            (window as unknown as { wp: Wp }).wp.apiFetch({
+              path: `/wp/v2/pages/${id}?force=true`,
+              method: 'DELETE',
+            }),
+          ),
+        ),
+      pages.map((created) => created.id),
     );
     await page.close();
   });
@@ -48,7 +52,7 @@ test.describe('M3 editor', () => {
     const errors: string[] = [];
     page.on('pageerror', (error) => errors.push(error.message));
 
-    created = await createPage(page);
+    const created = await createPage(page);
     await page.goto(`/wp-admin/admin.php?page=bestenberg&post=${created.id}`);
 
     const canvas = page.frameLocator('.bbe-canvas__frame');
@@ -58,6 +62,7 @@ test.describe('M3 editor', () => {
 
     // Insert a section, then a heading inside it.
     await page.getByRole('button', { name: 'Add', exact: true }).click();
+    await page.getByRole('button', { name: 'Components', exact: true }).click();
     await page.locator('[data-insert="section"]').click();
     await expect(canvas.locator('section[data-bb-id]')).toHaveCount(1);
     await page.locator('[data-insert="heading"]').click();
@@ -133,8 +138,58 @@ test.describe('M3 editor', () => {
     expect(errors).toEqual([]);
   });
 
+  test('inserts a library section, links text and shows where a value comes from', async ({
+    page,
+  }) => {
+    const created = await createPage(page);
+    await page.goto(`/wp-admin/admin.php?page=bestenberg&post=${created.id}`);
+    const canvas = page.frameLocator('.bbe-canvas__frame');
+    await expect(canvas.locator('#bb-canvas-root')).toBeAttached();
+
+    await page.getByRole('button', { name: 'Add', exact: true }).click();
+    await page.locator('[data-pattern="hero-centered"]').click();
+    const title = canvas.locator('section[data-bb-id] h1[data-bb-id]');
+    await expect(title).toHaveCount(1);
+    await expect(canvas.locator('section[data-bb-id] .wp-block-button__link')).toHaveCount(2);
+
+    // A second section goes below the first.
+    await page.locator('[data-pattern="cta-banner"]').click();
+    await expect(canvas.locator('section[data-bb-id]')).toHaveCount(2);
+    await expect(canvas.locator('section[data-bb-id]').nth(1)).toHaveClass(/bb:bg-primary/);
+
+    // Link the supporting line.
+    const line = canvas.locator('section[data-bb-id]').first().locator('p[data-bb-id]');
+    await line.dblclick();
+    await expect(line).toHaveAttribute('contenteditable', 'true');
+    await page.keyboard.press('ControlOrMeta+a');
+    await page.getByRole('button', { name: 'Link', exact: true }).click();
+    await page.getByLabel('Link address').fill('/contact');
+    await page.keyboard.press('Enter');
+    await expect(line.locator('a[href="/contact"]')).toHaveCount(1);
+    await page.keyboard.press('Escape');
+    await expect(line).not.toHaveAttribute('contenteditable', 'true');
+    await expect(line.locator('a[href="/contact"]')).toHaveCount(1);
+
+    // The heading's size is set for desktop; the inspector says so.
+    await title.click();
+    const size = page.locator('[data-control="font.size"]');
+    await expect(size).toContainText('from desktop');
+    await expect(size.getByLabel('Size', { exact: true })).toHaveValue('fontSize.5xl');
+    await page.getByRole('button', { name: 'Mobile', exact: true }).click();
+    await expect(size.getByLabel('Size', { exact: true })).toHaveValue('fontSize.4xl');
+
+    await page.getByRole('button', { name: 'Save', exact: true }).click();
+    await expect(page.getByRole('status')).toHaveText('Saved');
+
+    const front = await page.context().newPage();
+    await front.goto(created.link);
+    await expect(front.locator('section p a[href="/contact"]')).toHaveCount(1);
+    await expect(front.locator('section')).toHaveCount(2);
+    await front.close();
+  });
+
   test('the canvas is not available without a valid nonce', async ({ page }) => {
-    created ??= await createPage(page);
+    const created = await createPage(page);
     await page.goto(`/?bestenberg-canvas=${created.id}&_wpnonce=invalid`);
     await expect(page.locator('#bb-canvas-root')).toHaveCount(0);
   });

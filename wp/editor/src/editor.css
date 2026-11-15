@@ -364,6 +364,23 @@ html.wp-toolbar:has(body.bestenberg-fullscreen) {
   cursor: pointer;
 }
 
+.bbe-toolbar__link {
+  display: flex;
+  align-items: center;
+  margin: 0;
+}
+
+.bestenberg-app .bbe-toolbar__link input {
+  width: 220px;
+  height: 24px;
+  min-height: 24px;
+  margin: 0 6px 0 0;
+  border: 0;
+  border-radius: 4px;
+  line-height: 24px;
+  color: var(--bbe-ink);
+}
+
 .bbe-toolbar button:last-child {
   border-radius: 0 6px 6px 0;
 }
@@ -518,6 +535,37 @@ html.wp-toolbar:has(body.bestenberg-fullscreen) {
   cursor: pointer;
 }
 
+.bbe-inserter .bbe-segmented {
+  display: flex;
+  margin-bottom: 10px;
+}
+
+.bbe-inserter .bbe-segmented button {
+  flex: 1;
+}
+
+.bbe-inserter__patterns {
+  display: grid;
+  gap: 4px;
+}
+
+.bbe-inserter__patterns button {
+  display: grid;
+  gap: 2px;
+  padding: 8px 10px;
+  border: 1px solid var(--bbe-line);
+  border-radius: 6px;
+  background: var(--bbe-panel);
+  text-align: left;
+  cursor: pointer;
+}
+
+.bbe-inserter__patterns button span {
+  color: var(--bbe-muted);
+  font-size: 12px;
+}
+
+.bbe-inserter__patterns button:hover,
 .bbe-inserter__items button:hover {
   border-color: var(--bbe-ink);
 }

@@ -196,8 +196,25 @@ function TextField({ control, value, onChange }: FieldProps) {
   );
 }
 
-function MediaField({ control, value, onChange, node }: FieldProps) {
-  const src = typeof value === 'string' ? value : '';
+/** What the media library hands back; null removes the image. */
+interface PickedImage {
+  url: string;
+  id: number;
+  alt: string;
+}
+
+/** The image address a media control currently holds (image src or background image). */
+function mediaUrl(value: unknown): string {
+  if (typeof value === 'string') return value;
+  if (typeof value === 'object' && value !== null && 'image' in value) {
+    const image = (value as { image?: { url?: unknown } }).image;
+    return typeof image?.url === 'string' ? image.url : '';
+  }
+  return '';
+}
+
+function MediaField({ control, value, onChange }: FieldProps) {
+  const src = mediaUrl(value);
   const choose = () => {
     const media = window.wp?.media;
     if (!media) return;
@@ -209,30 +226,49 @@ function MediaField({ control, value, onChange, node }: FieldProps) {
     });
     frame.on('select', () => {
       const picked = frame.state().get('selection').first().toJSON();
-      onChange({ src: picked.url, mediaId: picked.id, alt: picked.alt ?? '' });
+      const image: PickedImage = { url: picked.url, id: picked.id, alt: picked.alt ?? '' };
+      onChange(image);
     });
     frame.open();
   };
   return (
-    <div className="bbe-media">
+    <div className="bbe-media" role="group" aria-label={control.label}>
       {src !== '' && <img src={src} alt="" />}
       <div className="bbe-media__actions">
         <button type="button" className="bbe-button bbe-button--small" onClick={choose}>
           {src === '' ? 'Choose image' : 'Replace'}
         </button>
-        {src !== '' && node.type === 'image' && (
+        {src !== '' && (
           <button
             type="button"
             className="bbe-button bbe-button--small bbe-button--quiet"
-            onClick={() => onChange({ src: '', mediaId: undefined })}
+            onClick={() => onChange(null)}
           >
             Remove
           </button>
         )}
       </div>
-      <span className="bbe-visually-hidden">{control.label}</span>
     </div>
   );
+}
+
+/** Applies a media library choice to an image component or a background. */
+function applyImage(node: Node, control: ControlDef, picked: PickedImage | null): Node {
+  if (control.path === 'style.background') {
+    const current = node.style?.base?.background;
+    const overlay = typeof current === 'object' ? current.overlay : undefined;
+    const background = picked
+      ? { image: { url: picked.url, id: picked.id }, ...(overlay ? { overlay } : {}) }
+      : undefined;
+    return setControlValue(node, control, background);
+  }
+  // Image component: address, library id and alt text travel together.
+  let next = setControlValue(node, control, picked?.url ?? '');
+  next = setControlValue(next, { path: 'props.mediaId' }, picked?.id);
+  if (picked && picked.alt !== '' && !node.props?.alt) {
+    next = setControlValue(next, { path: 'props.alt' }, picked.alt);
+  }
+  return next;
 }
 
 function fieldFor(control: ControlDef) {
@@ -290,20 +326,8 @@ export function Inspector() {
     const doc = currentDoc(state);
     if (!doc) return;
     const next = updateNode(doc, node.id, (current) => {
-      if (control.kind === 'media' && typeof value === 'object' && value !== null) {
-        // The media picker sets the image address, its library id and alt text together.
-        let updated = current;
-        for (const [key, item] of Object.entries(value)) {
-          if (key === 'alt' && current.props?.alt) continue;
-          const path = control.path.replace(/[^.]+$/, key);
-          updated = setControlValue(
-            updated,
-            { path },
-            key === 'src' && item === '' && node.type !== 'image' ? undefined : item,
-          );
-        }
-        return updated;
-      }
+      if (control.kind === 'media')
+        return applyImage(current, control, value as PickedImage | null);
       return setControlValue(current, control, value, writeBreakpoint);
     });
     const continuing = isTyping && typing.current === control.id;

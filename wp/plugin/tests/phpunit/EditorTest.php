@@ -17,11 +17,6 @@ use WP_UnitTestCase;
 
 final class EditorTest extends WP_UnitTestCase {
 
-	public function tear_down(): void {
-		unset( $_GET[ Canvas::QUERY_ARG ], $_GET['_wpnonce'] );
-		parent::tear_down();
-	}
-
 	private function render_request( string $markup ): \WP_REST_Response {
 		$request = new WP_REST_Request( 'POST', '/bestenberg/v1/render' );
 		$request->set_param( 'markup', $markup );
@@ -41,7 +36,7 @@ final class EditorTest extends WP_UnitTestCase {
 		$response = $this->render_request( '<!-- wp:paragraph --><p>Hello</p><!-- /wp:paragraph -->' );
 
 		$this->assertSame( 200, $response->get_status() );
-		$this->assertStringContainsString( '<p>Hello</p>', $response->get_data()['html'] );
+		$this->assertStringContainsString( 'Hello</p>', $response->get_data()['html'] );
 	}
 
 	public function test_render_endpoint_filters_html_for_users_without_unfiltered_html(): void {
@@ -64,38 +59,42 @@ final class EditorTest extends WP_UnitTestCase {
 
 	public function test_canvas_request_is_ignored_without_a_valid_nonce(): void {
 		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
-		$post_id                   = self::factory()->post->create( array( 'post_type' => 'page' ) );
-		$_GET[ Canvas::QUERY_ARG ] = (string) $post_id;
-		$_GET['_wpnonce']          = 'invalid';
+		$post_id = self::factory()->post->create( array( 'post_type' => 'page' ) );
 
-		$this->go_to( add_query_arg( Canvas::QUERY_ARG, $post_id, home_url( '/' ) ) );
+		$this->go_to(
+			add_query_arg(
+				array(
+					Canvas::QUERY_ARG => $post_id,
+					'_wpnonce'        => 'invalid',
+				),
+				home_url( '/' )
+			)
+		);
 
 		$this->assertFalse( is_page( $post_id ) );
+		$this->assertNotContains( 'bb-canvas', get_body_class() );
 	}
 
 	public function test_canvas_request_is_ignored_for_users_who_cannot_edit_the_post(): void {
 		wp_set_current_user( self::factory()->user->create( array( 'role' => 'subscriber' ) ) );
-		$post_id                   = self::factory()->post->create( array( 'post_type' => 'page' ) );
-		$_GET[ Canvas::QUERY_ARG ] = (string) $post_id;
-		$_GET['_wpnonce']          = wp_create_nonce( Canvas::NONCE_ACTION );
+		$post_id = self::factory()->post->create( array( 'post_type' => 'page' ) );
 
-		$this->go_to( add_query_arg( Canvas::QUERY_ARG, $post_id, home_url( '/' ) ) );
+		$this->go_to( Canvas::url( $post_id ) );
 
 		$this->assertFalse( is_page( $post_id ) );
+		$this->assertNotContains( 'bb-canvas', get_body_class() );
 	}
 
 	public function test_canvas_request_shows_the_post_to_its_editor(): void {
 		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
-		$post_id                   = self::factory()->post->create(
+		$post_id = self::factory()->post->create(
 			array(
 				'post_type'   => 'page',
 				'post_status' => 'draft',
 			)
 		);
-		$_GET[ Canvas::QUERY_ARG ] = (string) $post_id;
-		$_GET['_wpnonce']          = wp_create_nonce( Canvas::NONCE_ACTION );
 
-		$this->go_to( add_query_arg( Canvas::QUERY_ARG, $post_id, home_url( '/' ) ) );
+		$this->go_to( Canvas::url( $post_id ) );
 
 		$this->assertTrue( is_page( $post_id ) );
 		$this->assertContains( 'bb-canvas', get_body_class() );

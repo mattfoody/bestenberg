@@ -38,7 +38,7 @@ const boxControls = (layout: Parameters<typeof layoutControls>[0]) => [
   ...layoutControls(layout),
   ...widthControls(),
   ...spacingControls(),
-  ...colorControls(),
+  ...colorControls({ image: true }),
   ...effectsControls(),
   ...visibilityControls(),
 ];

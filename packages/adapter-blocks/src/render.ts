@@ -130,7 +130,8 @@ function renderNode(node: Node, registry: Registry, editor: boolean): string {
 
   const spec = CORE_BLOCKS[def.block];
   if (!spec) return '';
-  const { children: _children, ...own } = node;
+  const own: Node = { ...node };
+  delete own.children;
   const [block] = nodesToBlocks([own], { registry });
   const blockAttributes = { ...block!.attributes };
 

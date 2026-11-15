@@ -1,7 +1,16 @@
 import { useState } from '@wordpress/element';
 import type { DragEvent } from 'react';
-import { canMove, findNode, insertPlacement, type Doc, type Node } from '@bestenberg/schema';
-import { insert, move, registry } from '../actions';
+import {
+  PATTERNS,
+  PATTERN_CATEGORIES,
+  PATTERN_CATEGORY_LABELS,
+  canMove,
+  findNode,
+  insertPlacement,
+  type Doc,
+  type Node,
+} from '@bestenberg/schema';
+import { insert, insertPattern, move, registry } from '../actions';
 import { currentDoc, useStore } from '../store';
 
 type DropPosition = 'before' | 'inside' | 'after';
@@ -61,6 +70,7 @@ export function Structure() {
   const [drop, setDrop] = useState<DropTarget | null>(null);
   const [collapsed, setCollapsed] = useState<ReadonlySet<string>>(new Set());
   const [adding, setAdding] = useState(false);
+  const [tab, setTab] = useState<'sections' | 'components'>('sections');
 
   if (!doc) return <aside className="bbe-panel bbe-structure" aria-label="Page structure" />;
 
@@ -175,35 +185,83 @@ export function Structure() {
       </div>
       {adding && (
         <div className="bbe-inserter">
-          <p className="bbe-inserter__where">
-            {selected
-              ? `Adds to or after the selected ${(registry.get(selected.type)?.label ?? selected.type).toLowerCase()}.`
-              : 'Adds to the end of the page.'}
-          </p>
-          {categories.map((category) => (
-            <div key={category} className="bbe-inserter__group">
-              <h3>{category.charAt(0).toUpperCase() + category.slice(1)}</h3>
-              <div className="bbe-inserter__items">
-                {choices
-                  .filter((def) => def.category === category)
-                  .map((def) => (
-                    <button
-                      key={def.type}
-                      type="button"
-                      data-insert={def.type}
-                      onClick={() => insert(state, dispatch, def.type)}
-                    >
-                      {def.label}
-                    </button>
-                  ))}
-              </div>
-            </div>
-          ))}
+          <div className="bbe-segmented" role="group" aria-label="What to add">
+            <button
+              type="button"
+              aria-pressed={tab === 'sections'}
+              onClick={() => setTab('sections')}
+            >
+              Sections
+            </button>
+            <button
+              type="button"
+              aria-pressed={tab === 'components'}
+              onClick={() => setTab('components')}
+            >
+              Components
+            </button>
+          </div>
+          {tab === 'sections' ? (
+            <>
+              <p className="bbe-inserter__where">
+                {selected ? 'Adds below the selected section.' : 'Adds to the end of the page.'}
+              </p>
+              {PATTERN_CATEGORIES.map((category) => {
+                const items = PATTERNS.filter((pattern) => pattern.category === category);
+                if (items.length === 0) return null;
+                return (
+                  <div key={category} className="bbe-inserter__group">
+                    <h3>{PATTERN_CATEGORY_LABELS[category]}</h3>
+                    <div className="bbe-inserter__patterns">
+                      {items.map((pattern) => (
+                        <button
+                          key={pattern.id}
+                          type="button"
+                          data-pattern={pattern.id}
+                          onClick={() => insertPattern(state, dispatch, pattern.id)}
+                        >
+                          <strong>{pattern.label}</strong>
+                          <span>{pattern.description}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </>
+          ) : (
+            <>
+              <p className="bbe-inserter__where">
+                {selected
+                  ? `Adds to or after the selected ${(registry.get(selected.type)?.label ?? selected.type).toLowerCase()}.`
+                  : 'Adds to the end of the page.'}
+              </p>
+              {categories.map((category) => (
+                <div key={category} className="bbe-inserter__group">
+                  <h3>{category.charAt(0).toUpperCase() + category.slice(1)}</h3>
+                  <div className="bbe-inserter__items">
+                    {choices
+                      .filter((def) => def.category === category)
+                      .map((def) => (
+                        <button
+                          key={def.type}
+                          type="button"
+                          data-insert={def.type}
+                          onClick={() => insert(state, dispatch, def.type)}
+                        >
+                          {def.label}
+                        </button>
+                      ))}
+                  </div>
+                </div>
+              ))}
+            </>
+          )}
         </div>
       )}
       {doc.root.length === 0 ? (
         <p className="bbe-panel__empty">
-          Nothing here yet. Choose Add, then Section, to start the page.
+          Nothing here yet. Choose Add to start with a ready-made section.
         </p>
       ) : (
         <ul className="bbe-tree" role="tree" aria-label="Page structure">
