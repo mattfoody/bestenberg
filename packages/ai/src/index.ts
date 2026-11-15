@@ -7,3 +7,4 @@ export * from './snap';
 export * from './normalize';
 export * from './prompt';
 export * from './pipeline';
+export * from './score';

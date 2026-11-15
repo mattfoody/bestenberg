@@ -23,5 +23,8 @@
     "@bestenberg/schema": "workspace:*",
     "@bestenberg/tokens": "workspace:*",
     "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@bestenberg/adapter-blocks": "workspace:*"
   }
 }

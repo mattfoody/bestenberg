@@ -103,3 +103,14 @@
 
 **Done when:** a prompt produces valid sections in the editor, invalid output is repaired or rejected, and the user can keep or discard the result.
 
+---
+
+## M6 — AI from screenshot + eval
+
+- [x] **6.1 Screenshot input.** The Generate dialog accepts a PNG/JPEG/WebP screenshot (scaled down in the browser, sent inline); the pipeline passes it to the provider with rebuild instructions; the REST route forwards it to the model.
+- [x] **6.2 Structure score.** `structureScore()`: overlap of components, text and section count between expected and generated pages.
+- [x] **6.3 Eval harness.** `pnpm eval` (`packages/ai/eval/run.mjs`): fixture pages from the section library → reference screenshot → provider → generated page → screenshot → visual (relative to a blank page) + structure score, with a JSON report and screenshots in `test-results/eval`.
+- [x] **6.4 Providers.** `oracle` and `degraded` (verify the harness and that the metric discriminates; run in CI) and `openai` (any OpenAI-compatible API, for real models, on demand).
+
+**Done when:** a screenshot can be turned into sections in the editor and the harness runs in CI.
+

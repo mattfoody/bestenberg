@@ -20,6 +20,7 @@
     "test": "vitest run",
     "test:php": "wp-env run tests-cli --env-cwd=wp-content/plugins/bestenberg vendor/bin/phpunit",
     "test:e2e": "playwright test",
+    "eval": "node packages/ai/eval/run.mjs && node packages/ai/eval/run.mjs --provider=degraded --expect-below=0.4",
     "test:all": "pnpm typecheck && pnpm lint && pnpm test && pnpm stan && pnpm test:php && pnpm test:e2e",
     "stan": "composer --working-dir=wp/plugin stan",
     "env:start": "pnpm build && wp-env start",

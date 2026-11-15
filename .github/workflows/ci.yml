@@ -111,6 +111,9 @@ jobs:
       - name: E2E smoke
         if: matrix.e2e
         run: bin/ci-run.sh 'Playwright' pnpm test:e2e
+      - name: AI eval harness
+        if: matrix.e2e
+        run: bin/ci-run.sh 'AI eval' pnpm eval
       - uses: actions/upload-artifact@v4
         if: failure() && matrix.e2e
         with:

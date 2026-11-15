@@ -46,4 +46,6 @@ Log of non-obvious choices. Newest at the bottom. Format: date — decision — 
 - 2026-11-15 — AI results are committed as one undo step and reviewed with Keep / Discard (discard = undo) instead of a separate diff view. — The canvas already is the preview; one mechanism, nothing saved until the user saves.
 - 2026-11-15 — Only a read-only ability (`bestenberg/get-design-system`) is registered for now; abilities that create or restyle pages server-side are deferred. — They need the schema → blocks adapter and validator in PHP (or the hosted service); exposing a write ability without validation would break the schema-first principle.
 - 2026-11-15 — The AI route accepts screenshots only as inline data URLs. — The server never fetches a URL chosen by the user (no SSRF surface).
+- 2026-11-15 — The eval harness renders pages standalone (same `renderNodes()` and token CSS as the canvas, no WordPress) and scores visual similarity relative to a blank page, averaged with a structure score. — Fast and runnable anywhere; raw pixel difference rates a nearly empty page above 0.8 because pages are mostly background.
+- 2026-11-15 — CI runs the harness with an oracle and a degraded provider only; real models run on demand with `--provider=openai`. — CI must be deterministic and free; the oracle run proves the harness and the degraded run proves the metric can fail.
 

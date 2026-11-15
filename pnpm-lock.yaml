@@ -62,6 +62,10 @@ importers:
       zod:
         specifier: ^3.25.76
         version: 3.25.76
+    devDependencies:
+      '@bestenberg/adapter-blocks':
+        specifier: workspace:*
+        version: link:../adapter-blocks
 
   packages/schema:
     dependencies:
