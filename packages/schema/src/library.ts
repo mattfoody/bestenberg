@@ -69,7 +69,7 @@ const buttons = (items: Array<[label: string, variant?: string]>, style?: StyleI
   );
 const section = (style: Style, children: Node[], width = 'container.lg') =>
   n('section', {}, { padding: { x: 'space.6', y: 'space.16' }, ...style }, [
-    n('container', null, { width } as Style, children),
+    n('container', {}, { width } as Style, children),
   ]);
 
 const featureCard = (title: string, body: string) =>

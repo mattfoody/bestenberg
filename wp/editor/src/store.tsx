@@ -39,12 +39,15 @@ export interface EditorState {
   scope: Scope;
   busy: 'loading' | 'saving' | null;
   notice: Notice | null;
+  /** Sections the AI just added, waiting for the user to keep or discard them. */
+  review: { sections: number } | null;
 }
 
 export type Action =
   | { type: 'loading' }
   | { type: 'loaded'; post: LoadedPost; doc: Doc }
-  | { type: 'commit'; doc: Doc; select?: string | null }
+  | { type: 'commit'; doc: Doc; select?: string | null; review?: { sections: number } }
+  | { type: 'review-done' }
   | { type: 'replace'; doc: Doc }
   | { type: 'undo' }
   | { type: 'redo' }
@@ -65,6 +68,7 @@ export const initialState: EditorState = {
   scope: 'all',
   busy: null,
   notice: null,
+  review: null,
 };
 
 /** Keeps the selection only if that node still exists. */
@@ -85,6 +89,7 @@ export function reducer(state: EditorState, action: Action): EditorState {
         selectedId: null,
         busy: null,
         notice: null,
+        review: null,
       };
     case 'commit': {
       if (!state.history) return state;
@@ -93,6 +98,7 @@ export function reducer(state: EditorState, action: Action): EditorState {
         ...state,
         history: pushHistory(state.history, action.doc),
         selectedId: keepSelection(action.doc, selectedId),
+        review: action.review ?? null,
       };
     }
     case 'replace':
@@ -103,7 +109,15 @@ export function reducer(state: EditorState, action: Action): EditorState {
     case 'redo': {
       if (!state.history) return state;
       const history = action.type === 'undo' ? undo(state.history) : redo(state.history);
-      return { ...state, history, selectedId: keepSelection(history.present, state.selectedId) };
+      return {
+        ...state,
+        history,
+        selectedId: keepSelection(history.present, state.selectedId),
+        review: null,
+      };
+    }
+    case 'review-done': {
+      return { ...state, review: null };
     }
     case 'select':
       return { ...state, selectedId: action.id };

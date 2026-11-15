@@ -51,7 +51,17 @@ importers:
         specifier: workspace:*
         version: link:../tokens
 
-  packages/ai: {}
+  packages/ai:
+    dependencies:
+      '@bestenberg/schema':
+        specifier: workspace:*
+        version: link:../schema
+      '@bestenberg/tokens':
+        specifier: workspace:*
+        version: link:../tokens
+      zod:
+        specifier: ^3.25.76
+        version: 3.25.76
 
   packages/schema:
     dependencies:
@@ -76,6 +86,9 @@ importers:
       '@bestenberg/adapter-blocks':
         specifier: workspace:*
         version: link:../../packages/adapter-blocks
+      '@bestenberg/ai':
+        specifier: workspace:*
+        version: link:../../packages/ai
       '@bestenberg/schema':
         specifier: workspace:*
         version: link:../../packages/schema

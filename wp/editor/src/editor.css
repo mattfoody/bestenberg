@@ -713,3 +713,99 @@ html.wp-toolbar:has(body.bestenberg-fullscreen) {
     transition: none;
   }
 }
+
+/* ── AI ──────────────────────────────────────────────────────────────────── */
+
+.bbe-dialog {
+  width: min(520px, calc(100vw - 32px));
+  padding: 20px;
+  border: 0;
+  border-radius: 10px;
+  color: var(--bbe-ink);
+  box-shadow: 0 24px 64px rgb(22 32 46 / 0.32);
+}
+
+.bbe-dialog::backdrop {
+  background: rgb(22 32 46 / 0.4);
+}
+
+.bbe-dialog h2 {
+  margin: 0 0 16px;
+  font-size: 16px;
+  font-weight: 650;
+}
+
+.bbe-dialog__label,
+.bbe-dialog legend {
+  display: block;
+  margin: 14px 0 6px;
+  padding: 0;
+  font-weight: 600;
+}
+
+.bbe-dialog textarea {
+  display: block;
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--bbe-line);
+  border-radius: 6px;
+  font: inherit;
+  line-height: 1.45;
+  resize: vertical;
+}
+
+.bbe-dialog__choice {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.bbe-dialog__choice label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 0;
+}
+
+.bestenberg-app .bbe-dialog__choice input {
+  margin: 0;
+}
+
+.bbe-dialog__hint,
+.bbe-dialog__progress {
+  margin: 8px 0 0;
+  color: var(--bbe-muted);
+}
+
+.bbe-dialog__problem {
+  margin: 12px 0 0;
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: #fdecea;
+  color: var(--bbe-danger);
+}
+
+.bbe-dialog__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 4px;
+  margin-top: 20px;
+}
+
+.bbe-review {
+  position: absolute;
+  left: 50%;
+  bottom: 28px;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 8px 8px 14px;
+  border-radius: 8px;
+  background: var(--bbe-panel);
+  box-shadow:
+    0 0 0 1px var(--bbe-line),
+    0 8px 24px rgb(22 32 46 / 0.2);
+  transform: translateX(-50%);
+  white-space: nowrap;
+}

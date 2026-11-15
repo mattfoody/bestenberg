@@ -39,6 +39,7 @@ setup() {
 
   ln -sfn "$ROOT/wp/plugin" "$WP/wp-content/plugins/bestenberg"
   ln -sfn "$ROOT/wp/theme" "$WP/wp-content/themes/bestenberg"
+  ln -sfn "$ROOT/tests/e2e/mu-plugins" "$WP/wp-content/mu-plugins"
 
   cat > "$WP/wp-config.php" <<EOF
 <?php

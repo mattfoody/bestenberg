@@ -188,6 +188,60 @@ test.describe('M3 editor', () => {
     await front.close();
   });
 
+  test('generates sections with AI, repairs invalid output and lets the user discard or keep', async ({
+    page,
+  }) => {
+    // The e2e mu-plugin answers AI calls for requests carrying this header.
+    await page.setExtraHTTPHeaders({ 'X-Bestenberg-E2E': '1' });
+    const created = await createPage(page);
+    await page.goto(`/wp-admin/admin.php?page=bestenberg&post=${created.id}`);
+    const canvas = page.frameLocator('.bbe-canvas__frame');
+    await expect(canvas.locator('#bb-canvas-root')).toBeAttached();
+
+    const generate = async () => {
+      await page.getByRole('button', { name: 'Generate', exact: true }).click();
+      const dialog = page.getByRole('dialog', { name: 'Generate with AI' });
+      await dialog.getByLabel('What should it make?').fill('A landing page for a bakery');
+      await dialog.getByRole('button', { name: 'Generate', exact: true }).click();
+      await expect(dialog).toBeHidden();
+    };
+
+    await generate();
+    const sections = canvas.locator('section[data-bb-id]');
+    await expect(sections).toHaveCount(2);
+    // Off-scale values were snapped to tokens; unsafe HTML was removed.
+    await expect(sections.first()).toHaveClass(/bb:bg-primary/);
+    await expect(sections.first()).toHaveClass(/bb:py-20/);
+    await expect(sections.first().locator('h1')).toHaveText('Bread worth waking up for');
+    await expect(sections.first().locator('h1')).toHaveClass(/bb:text-5xl/);
+    await expect(sections.first().locator('.wp-block-button__link')).toHaveText('Order online');
+    await expect(canvas.locator('script', { hasText: 'alert(1)' })).toHaveCount(0);
+    await expect(sections.nth(1).locator('li')).toHaveCount(2);
+
+    // Discard removes the draft.
+    const review = page.locator('.bbe-review');
+    await expect(review).toContainText('The AI added 2 sections');
+    await review.getByRole('button', { name: 'Discard' }).click();
+    await expect(sections).toHaveCount(0);
+    await expect(review).toHaveCount(0);
+
+    // Generate again, keep and save.
+    await generate();
+    await review.getByRole('button', { name: 'Keep' }).click();
+    await expect(review).toHaveCount(0);
+    await page.getByRole('button', { name: 'Save', exact: true }).click();
+    await expect(page.getByRole('status')).toHaveText('Saved');
+
+    const front = await page.context().newPage();
+    await front.goto(created.link);
+    await expect(front.locator('section h1')).toHaveText('Bread worth waking up for');
+    await expect(front.locator('section a.wp-block-button__link')).toHaveAttribute(
+      'href',
+      '/order',
+    );
+    await front.close();
+  });
+
   test('the canvas is not available without a valid nonce', async ({ page }) => {
     const created = await createPage(page);
     await page.goto(`/?bestenberg-canvas=${created.id}&_wpnonce=invalid`);

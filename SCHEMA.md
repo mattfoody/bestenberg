@@ -151,6 +151,8 @@ UI rules:
 - The model receives: JSON Schema generated from the registry, component `ai.description`s, the token list, and optionally the current doc.
 - It returns a `Doc` or a patch (`{ op: "insert"|"replace"|"update"|"remove", target: id, node? }`) for "edit selection".
 - Validation errors are returned to the model verbatim for repair (max 3 rounds).
+- The model returns `{ "sections": Node[] }` without ids. `normalizeNodes()` assigns ids, maps common near-misses and snaps every style value to the nearest token before validation; `generateSections()` runs the validate/repair loop.
+- The same instructions are generated into `wp/plugin/generated/ai-context.php` and exposed through the `bestenberg/get-design-system` ability.
 - Screenshots are usually desktop: the model must still output mobile as `base` with `tablet`/`desktop` overrides (e.g. grid `columns: 1` base, `desktop.columns: 3`). Prompt includes this rule and an example; validator flags docs with desktop-only layouts.
 - Off-token values (e.g. a hex color from a screenshot) are snapped to the nearest token; if the distance is too large, the editor suggests adding a token.
 

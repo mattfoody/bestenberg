@@ -1,6 +1,7 @@
 import { useEffect, useState } from '@wordpress/element';
 import { openPost, save } from '../actions';
 import { createPage, errorMessage, listPosts, settings, type PostSummary } from '../api';
+import { AiDialog } from './AiDialog';
 import { isDirty, useStore, type Scope, type Viewport } from '../store';
 
 const VIEWPORTS: Array<{ value: Viewport; label: string }> = [
@@ -25,6 +26,7 @@ function optionLabel(post: PostSummary): string {
 export function TopBar() {
   const { state, dispatch } = useStore();
   const [posts, setPosts] = useState<PostSummary[]>([]);
+  const [generating, setGenerating] = useState(false);
   const dirty = isDirty(state);
   const history = state.history;
 
@@ -135,6 +137,7 @@ export function TopBar() {
       </div>
 
       <div className="bbe-bar__end">
+        {generating && <AiDialog onClose={() => setGenerating(false)} />}
         {state.notice && (
           <span
             className={`bbe-notice bbe-notice--${state.notice.kind}`}
@@ -152,6 +155,14 @@ export function TopBar() {
             )}
           </span>
         )}
+        <button
+          type="button"
+          className="bbe-button"
+          disabled={!state.post || state.busy !== null}
+          onClick={() => setGenerating(true)}
+        >
+          Generate
+        </button>
         <button
           type="button"
           className="bbe-button bbe-button--quiet"

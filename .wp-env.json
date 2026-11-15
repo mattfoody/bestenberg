@@ -5,7 +5,8 @@
   "plugins": ["https://downloads.wordpress.org/plugin/woocommerce.zip"],
   "mappings": {
     "wp-content/plugins/bestenberg": "./wp/plugin",
-    "wp-content/themes/bestenberg": "./wp/theme"
+    "wp-content/themes/bestenberg": "./wp/theme",
+    "wp-content/mu-plugins": "./tests/e2e/mu-plugins"
   },
   "config": {
     "WP_DEBUG": true,

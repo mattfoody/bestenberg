@@ -18,5 +18,10 @@
   "scripts": {
     "build": "tsup src/index.ts --format esm --dts --clean --tsconfig tsconfig.build.json",
     "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@bestenberg/schema": "workspace:*",
+    "@bestenberg/tokens": "workspace:*",
+    "zod": "^3.25.76"
   }
 }

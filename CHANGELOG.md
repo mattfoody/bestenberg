@@ -1,6 +1,7 @@
 # Changelog
 
 ## Unreleased
+- M5: Generate with AI — describe a page or section (optionally with a screenshot) and get editable sections built from the site's tokens and components; output is validated, repaired up to three times, and kept or discarded by the user. Uses the provider connected under Settings → Connectors. `bestenberg/get-design-system` ability for AI agents.
 - M4: section library (hero, features, content, testimonials, pricing, call to action), links in text, background images with overlay, per-size overrides with "from …" hints and reset.
 - M3: the Bestenberg editor — live canvas of the real page, inline text editing, structure tree with drag-and-drop, token inspector generated from the registry, viewport preview with "all sizes" / "this size and up" styling, undo/redo, save as native blocks, "Edit with Bestenberg" links.
 - Self-hosted updates for the plugin and theme (Update URI + updater), `pnpm release:*` scripts and a tag-driven release workflow that uploads to the update server.

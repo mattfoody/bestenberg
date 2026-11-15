@@ -88,3 +88,18 @@
 
 **Done when:** overrides can be set per size and sections can be inserted from the library.
 
+---
+
+## M5 — AI from prompt
+
+- [x] **5.1 Provider interface.** `ModelProvider` in `@bestenberg/ai` (one stateless call: system, prompt, images); scripted provider for tests.
+- [x] **5.2 Prompts from the registry.** System prompt generated from components, style shape and tokens, with a library section as the example; user and repair prompts.
+- [x] **5.3 Normalize and snap.** Model output → nodes: fresh ids, type/prop aliases, loose buttons and top-level content wrapped, rich text and URLs sanitized, every style value snapped to the nearest token (names, scale numbers, CSS lengths, hex colours).
+- [x] **5.4 Validate and repair.** `generateSections()`: validate, feed problems back, at most 3 repair rounds, never returns invalid output as ok.
+- [x] **5.5 WordPress AI Client.** `POST bestenberg/v1/ai/generate` forwards one call to the site's connected provider; `GET …/ai/status`; `bestenberg_pre_ai_generate` and `bestenberg_ai_available` filters for the hosted service and tests.
+- [x] **5.6 Abilities API.** `bestenberg/get-design-system` (read-only) returns generated instructions, components and tokens.
+- [x] **5.7 Editor.** Generate dialog (prompt, optional screenshot, add or replace), progress, and a keep/discard review bar; discard is an undo.
+- [x] **5.8 Tests.** Unit tests for snapping, normalizing, prompts and the repair loop; PHPUnit for routes and ability; e2e with a scripted provider (repair, snapping, sanitizing, discard, keep, save).
+
+**Done when:** a prompt produces valid sections in the editor, invalid output is repaired or rejected, and the user can keep or discard the result.
+

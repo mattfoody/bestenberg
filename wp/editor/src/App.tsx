@@ -80,7 +80,31 @@ function Editor() {
         <Structure />
         <main className="bestenberg-app__canvas">
           {state.post ? (
-            <Canvas onShortcut={onShortcut} />
+            <>
+              <Canvas onShortcut={onShortcut} />
+              {state.review && (
+                <div className="bbe-review" role="status">
+                  <span>
+                    The AI added {state.review.sections}{' '}
+                    {state.review.sections === 1 ? 'section' : 'sections'}. Nothing is saved yet.
+                  </span>
+                  <button
+                    type="button"
+                    className="bbe-button bbe-button--small"
+                    onClick={() => dispatch({ type: 'undo' })}
+                  >
+                    Discard
+                  </button>
+                  <button
+                    type="button"
+                    className="bbe-button bbe-button--small bbe-button--primary"
+                    onClick={() => dispatch({ type: 'review-done' })}
+                  >
+                    Keep
+                  </button>
+                </div>
+              )}
+            </>
           ) : (
             <p className="bbe-welcome">
               {state.busy === 'loading' ? 'Opening…' : 'Choose a page in the bar above to edit it.'}

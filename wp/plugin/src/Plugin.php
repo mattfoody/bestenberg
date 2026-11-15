@@ -10,6 +10,8 @@ declare( strict_types=1 );
 namespace Bestenberg;
 
 use Bestenberg\Admin\EditorPage;
+use Bestenberg\Ai\Abilities;
+use Bestenberg\Ai\AiController;
 use Bestenberg\Blocks\CoreBlockStyles;
 use Bestenberg\Blocks\LayoutBlocks;
 use Bestenberg\Editor\Canvas;
@@ -75,6 +77,8 @@ final class Plugin {
 		( new CoreBlockStyles( $config['core'], $style_classes, $this->collector() ) )->register();
 		( new Canvas() )->register();
 		( new RenderController() )->register();
+		( new AiController() )->register();
+		( new Abilities() )->register();
 		Updater::from_plugin_header()?->register();
 	}
 

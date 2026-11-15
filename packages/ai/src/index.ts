@@ -1,7 +1,9 @@
 /**
- * @bestenberg/ai — prompt/screenshot → schema pipeline.
- * Implemented in M5–M6 (see PLAN.md §6).
+ * @bestenberg/ai — prompt/screenshot → schema pipeline (PLAN.md §6).
+ * WP-agnostic: a ModelProvider supplies the model; everything else is pure.
  */
-
-/** Maximum validation/repair rounds before giving up (SCHEMA.md §8). */
-export const MAX_REPAIR_ROUNDS = 3 as const;
+export * from './provider';
+export * from './snap';
+export * from './normalize';
+export * from './prompt';
+export * from './pipeline';

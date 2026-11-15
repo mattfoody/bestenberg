@@ -150,7 +150,7 @@ test.describe.serial('M2: adapter markup in WordPress', () => {
     ).toBe(3);
     await expect(page.locator('article.bb-card')).toHaveCount(3);
 
-    const button = page.locator('a.wp-block-button__link');
+    const button = page.locator('.bb-section a.wp-block-button__link');
     await expect(button).toHaveAttribute('href', '/start');
     await expect(button).toHaveCSS('background-color', 'rgb(245, 158, 11)'); // color.accent
 
