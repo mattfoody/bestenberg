@@ -93,6 +93,32 @@ Install the first release zip once (Plugins → Add New → Upload, and the same
 then click **Enable auto-updates** on the plugin and theme. From then on, every tag you
 push reaches them automatically.
 
+## License keys
+
+Sites can store a key under **Bestenberg → License**. When one is set, every request WordPress
+makes to the update URL (`info.json` and the zips) carries it in the `X-Bestenberg-License`
+header. Nothing in the plugin is switched off without a key.
+
+The server ignores the header until you decide to require it. To serve updates to customers
+only, keep a list of valid keys on the VPS and let nginx check it:
+
+```nginx
+# /etc/nginx/conf.d/bestenberg-keys.conf — one line per customer
+map $http_x_bestenberg_license $bestenberg_licensed {
+    default        0;
+    "KEY-OF-CUSTOMER-1"  1;
+    "KEY-OF-CUSTOMER-2"  1;
+}
+```
+
+```nginx
+# inside the server block: info.json stays public, zips need a key
+location ~ ^/bestenberg/.+\.zip$ { if ($bestenberg_licensed = 0) { return 403; } }
+```
+
+Removing a line ends updates for that key; the site keeps running the version it has.
+Pricing and tiers are a business decision (PLAN.md §10) and need no code change.
+
 ## Different domain?
 
 Change `Update URI` in `wp/plugin/bestenberg.php` and `wp/theme/style.css` (same value,

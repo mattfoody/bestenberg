@@ -7,6 +7,7 @@
  *   wp/plugin/tests/fixtures/style-classes.json   TS → PHP parity cases
  *   wp/plugin/tests/fixtures/adapter-page.html    markup of fixtures/adapter-page.json
  *   wp/theme/templates/*.html, wp/theme/parts/*.html   base theme (from src/theme.ts)
+ *   wp/plugin/demo/pages.json                     demo site pages (from src/demo.ts)
  *
  * Run after building the packages: `pnpm generate`.
  */
@@ -21,6 +22,8 @@ import {
   docToMarkup,
   ownComponents,
   runtimeConfig,
+  DEMO_IMAGE_BASE,
+  DEMO_PAGES,
   THEME_FILES,
 } from '@bestenberg/adapter-blocks';
 import {
@@ -162,6 +165,28 @@ for (const themeFile of THEME_FILES) {
   }
   await write(`wp/theme/${themeFile.path}`, `${docToMarkup(themeFile.doc)}\n`);
 }
+
+// 7. Demo site pages (imported by Bestenberg\Demo\Importer).
+const demoPages = DEMO_PAGES.map((demo) => {
+  const check = validateDoc(demo.doc, { registry: defaultRegistry });
+  if (!check.ok) {
+    throw new Error(`Demo page ${demo.slug} is invalid:\n${JSON.stringify(check.issues, null, 2)}`);
+  }
+  return {
+    slug: demo.slug,
+    title: demo.title,
+    front: demo.front === true,
+    content: docToMarkup(demo.doc),
+  };
+});
+await write(
+  'wp/plugin/demo/pages.json',
+  await pretty(
+    resolve(root, 'wp/plugin/demo/pages.json'),
+    JSON.stringify({ imageBase: DEMO_IMAGE_BASE, pages: demoPages }),
+    'json',
+  ),
+);
 
 console.log(
   `  ${own.length} Bestenberg blocks, ${withClasses.length} parity cases, ${THEME_FILES.length} theme files`,

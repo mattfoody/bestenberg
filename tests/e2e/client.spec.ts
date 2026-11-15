@@ -52,11 +52,17 @@ async function createPage(page: Page): Promise<CreatedPage> {
 
 test.describe('M8 client mode', () => {
   test.afterEach(async ({ page }) => {
+    await page.goto('/wp-admin/admin.php?page=bestenberg');
+    // Later tests must not find an introduction open, whatever happened in this one.
+    await page.evaluate(async () => {
+      const { apiFetch } = (window as unknown as { wp: Wp }).wp;
+      for (const mode of ['design', 'client']) {
+        await apiFetch({ path: '/bestenberg/v1/onboarding', method: 'POST', data: { mode } });
+      }
+    });
     if (!created) return;
     const id = created.id;
     created = null;
-    await page.setExtraHTTPHeaders({});
-    await page.goto('/wp-admin/admin.php?page=bestenberg');
     await page.evaluate(
       (pageId) =>
         (window as unknown as { wp: Wp }).wp.apiFetch({
@@ -143,9 +149,12 @@ test.describe('M8 client mode', () => {
   });
 
   test('each mode is introduced once', async ({ page }) => {
-    await page.setExtraHTTPHeaders({ 'X-Bestenberg-E2E': 'reset-onboarding' });
+    // One request that resets the introductions for this user (see mu-plugins/bestenberg-e2e.php).
+    const reset = await page.request.get('/wp-admin/admin-ajax.php?action=bestenberg-e2e', {
+      headers: { 'X-Bestenberg-E2E': 'reset-onboarding' },
+    });
+    expect(reset.status()).toBeLessThan(500);
     await page.goto('/wp-admin/admin.php?page=bestenberg');
-    await page.setExtraHTTPHeaders({});
 
     const dialog = page.locator('.bbe-welcome-dialog');
     await expect(dialog).toContainText('Welcome to Bestenberg');

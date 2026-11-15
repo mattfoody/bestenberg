@@ -66,6 +66,7 @@ test.describe('M7 templates', () => {
 
   test('opens a template chosen from the picker', async ({ page }) => {
     await page.goto('/wp-admin/admin.php?page=bestenberg');
+    await expect(page.getByRole('button', { name: 'Add demo pages' })).toBeVisible();
     const picker = page.getByRole('combobox', { name: 'Page', exact: true });
     await expect(picker.locator('option[value="templates:bestenberg//404"]')).toBeAttached();
     await picker.selectOption('templates:bestenberg//404');

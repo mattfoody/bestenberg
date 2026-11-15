@@ -4,6 +4,7 @@ AI-native visual editor on Gutenberg, by [Matt Foody](https://mattfoody.com).
 
 Bestenberg replaces the default Site Editor UX with a fast, opinionated, token-based visual editor. AI generates pages, templates and sections from prompts or screenshots. Everything is stored as native WordPress blocks, so sites keep working without the plugin.
 
+- User and developer guides: [docs/](docs/README.md)
 - Vision, principles, milestones: [PLAN.md](PLAN.md)
 - Data model, tokens, registry, CSS: [SCHEMA.md](SCHEMA.md)
 - Current tasks: [TASKS.md](TASKS.md)

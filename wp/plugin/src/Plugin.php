@@ -14,7 +14,9 @@ use Bestenberg\Ai\Abilities;
 use Bestenberg\Ai\AiController;
 use Bestenberg\Blocks\CoreBlockStyles;
 use Bestenberg\Blocks\LayoutBlocks;
+use Bestenberg\Demo\Importer;
 use Bestenberg\Editor\Canvas;
+use Bestenberg\Licensing\License;
 use Bestenberg\Rest\OnboardingController;
 use Bestenberg\Rest\RenderController;
 use Bestenberg\Styles\Collector;
@@ -79,9 +81,12 @@ final class Plugin {
 		( new Canvas() )->register();
 		( new RenderController() )->register();
 		( new OnboardingController() )->register();
+		( new Importer() )->register();
 		( new AiController() )->register();
 		( new Abilities() )->register();
-		Updater::from_plugin_header()?->register();
+		$updater = Updater::from_plugin_header();
+		$updater?->register();
+		( new License( $updater?->base_url() ?? '' ) )->register();
 	}
 
 	/**

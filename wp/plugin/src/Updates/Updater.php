@@ -48,6 +48,13 @@ final class Updater {
 	}
 
 	/**
+	 * Update base URL with trailing slash.
+	 */
+	public function base_url(): string {
+		return $this->base_url;
+	}
+
+	/**
 	 * Registers hooks.
 	 */
 	public function register(): void {

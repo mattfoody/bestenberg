@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="Three loaves of bread on a shelf">
+  <rect width="800" height="600" fill="#f3e9dc"/>
+  <rect y="430" width="800" height="170" fill="#d9c2a3"/>
+  <rect y="420" width="800" height="14" fill="#b89468"/>
+  <g>
+    <ellipse cx="210" cy="360" rx="150" ry="78" fill="#b9772f"/>
+    <ellipse cx="210" cy="346" rx="132" ry="58" fill="#d3954a"/>
+    <path d="M130 330q20-26 46-30M190 322q20-26 46-30M250 330q20-26 46-30" stroke="#f1d9ae" stroke-width="10" stroke-linecap="round" fill="none"/>
+  </g>
+  <g>
+    <rect x="390" y="270" width="170" height="155" rx="46" fill="#a9682a"/>
+    <rect x="404" y="282" width="142" height="110" rx="38" fill="#c98a43"/>
+    <path d="M436 300v70M475 296v78M514 300v70" stroke="#efd3a2" stroke-width="9" stroke-linecap="round"/>
+  </g>
+  <g>
+    <ellipse cx="672" cy="372" rx="92" ry="56" fill="#8f5522"/>
+    <ellipse cx="672" cy="362" rx="78" ry="42" fill="#b57a3a"/>
+    <circle cx="640" cy="356" r="5" fill="#f1d9ae"/><circle cx="668" cy="346" r="5" fill="#f1d9ae"/>
+    <circle cx="698" cy="358" r="5" fill="#f1d9ae"/><circle cx="676" cy="374" r="5" fill="#f1d9ae"/>
+  </g>
+  <circle cx="660" cy="120" r="54" fill="#f6c453"/>
+</svg>

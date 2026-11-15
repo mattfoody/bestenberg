@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from '@wordpress/element';
 import { duplicate, openPost, remove, save } from './actions';
-import { settings } from './api';
+import { addDemoPages, errorMessage, settings } from './api';
 import { Canvas } from './canvas/Canvas';
 import { Inspector } from './panels/Inspector';
 import { Structure } from './panels/Structure';
@@ -58,6 +58,20 @@ function Editor() {
     return () => window.removeEventListener('keydown', onShortcut);
   }, [onShortcut]);
 
+  const addDemo = () => {
+    dispatch({ type: 'loading' });
+    addDemoPages()
+      .then((id) => {
+        // Reload so the page list includes the new pages.
+        const url = new URL(settings().editorUrl);
+        if (id > 0) url.searchParams.set('post', String(id));
+        window.location.assign(url.toString());
+      })
+      .catch((error) =>
+        dispatch({ type: 'failed', text: `The demo pages were not added. ${errorMessage(error)}` }),
+      );
+  };
+
   const dirty = isDirty(state);
   useEffect(() => {
     if (!dirty) return;
@@ -108,9 +122,21 @@ function Editor() {
               )}
             </>
           ) : (
-            <p className="bbe-welcome">
-              {state.busy === 'loading' ? 'Opening…' : 'Choose a page in the bar above to edit it.'}
-            </p>
+            <div className="bbe-welcome">
+              <p>
+                {state.busy === 'loading'
+                  ? 'Opening…'
+                  : 'Choose a page in the bar above to edit it.'}
+              </p>
+              {state.busy === null && settings().canDesign && (
+                <>
+                  <p>New here? Start from a small example site: four pages you can restyle.</p>
+                  <button type="button" className="bbe-button" onClick={addDemo}>
+                    Add demo pages
+                  </button>
+                </>
+              )}
+            </div>
           )}
         </main>
         <Inspector />

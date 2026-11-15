@@ -1,6 +1,7 @@
 # Changelog
 
 ## Unreleased
+- M9: demo site ("Add demo pages"), license key for the update server (Bestenberg → License), uninstall cleanup, documentation in `docs/`.
 - M8: client mode — people who edit content change text, images and links only; designers decide per component whether items can be added/reordered/removed or nothing can change; "Client view" preview; one-time introductions.
 - M7: templates, header and footer are editable in the Bestenberg editor; "Site data" inserter for menu, search, post and store blocks; WooCommerce product, catalog, cart, checkout and order confirmation templates.
 - M6: screenshot → page in the Generate dialog; `pnpm eval` harness scoring generated pages against fixtures (visual + structure).

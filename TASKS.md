@@ -134,3 +134,13 @@
 - [x] **8.5 Tests.** Unit tests for locks, PHPUnit for onboarding, e2e for client editing, designer locks and the introductions.
 
 **Done when:** a client can change content without being able to break the design.
+
+## M9 — Ship
+
+- [x] **9.1 Demo site.** Four bakery pages built from the section library (`packages/adapter-blocks/src/demo.ts` → `wp/plugin/demo/pages.json`); `Bestenberg\Demo\Importer` (never overwrites, sets the front page only on sites without one); "Add demo pages" in the editor, REST route, `wp eval`.
+- [x] **9.2 Licensing.** Bestenberg → License stores a key; it is sent as `X-Bestenberg-License` to the update server only. No feature gating. Server-side enforcement documented in RELEASING.md.
+- [x] **9.3 Packaging.** `uninstall.php` (removes user meta, license, update cache); release build checks the zip for the demo content and uninstall file; readme.txt for the release.
+- [x] **9.4 Docs.** `docs/`: getting started, designing, client editing, AI, store, development.
+- [ ] **9.5 First release.** Needs Matt: update server (RELEASING.md "One-time setup"), then `pnpm release:bump 0.2.0 && git push --follow-tags`. Pricing and license tiers are open (PLAN.md §10).
+
+**Done when:** a tagged release reaches a site through Dashboard → Updates.

@@ -55,4 +55,8 @@ Log of non-obvious choices. Newest at the bottom. Format: date — decision — 
 - 2026-11-15 — Only "locked completely" (`all`) is inherited by children; "items can be arranged" (`none`) applies to direct children only. — Opening a list of cards should not also make every heading inside a card deletable.
 - 2026-11-15 — In open groups clients duplicate, reorder and remove existing items; they get no component inserter. — "Another one like this" is what content editors need, and it cannot produce off-design layouts.
 - 2026-11-15 — Client mode is enforced in the editor (one `can()` check in every action), not on the server. — Anyone who may edit a page in WordPress can already change its blocks in the block editor; client mode protects against accidents, it is not a security boundary. A server-side diff check can be added if sites need it.
+- 2026-11-15 — The license key gates nothing in the plugin; it is only sent to the update server, which may require it for downloads. — The code is GPL and sites must never break because a license lapsed; what is sold is updates and support.
+- 2026-11-15 — The key travels in a request header, not in the URL. — URLs end up in server logs and proxies.
+- 2026-11-15 — The demo site is generated from the section library and imported as ordinary pages, marked with post meta; existing demo pages are never overwritten. — Demonstrates the real product path (schema → blocks), is reproducible, and is safe to run twice.
+- 2026-11-15 — Demo pictures are SVG files shipped in the plugin and referenced by URL, not imported into the media library. — No network access or uploads needed at import; users replace them with their own images.
 

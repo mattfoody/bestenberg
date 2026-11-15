@@ -310,6 +310,14 @@ html.wp-toolbar:has(body.bestenberg-fullscreen) {
   font-size: 15px;
 }
 
+.bbe-welcome p {
+  margin: 0 0 12px;
+}
+
+.bbe-welcome p + p {
+  margin-top: 32px;
+}
+
 .bbe-canvas {
   position: absolute;
   inset: 0;
@@ -833,4 +841,25 @@ html.wp-toolbar:has(body.bestenberg-fullscreen) {
 .bbe-welcome-dialog li {
   padding-left: 14px;
   border-left: 2px solid var(--bbe-select);
+}
+
+/* The bar never wraps: the size switch stays on one line and the selects give way. */
+.bbe-bar .bbe-segmented {
+  flex: none;
+  flex-wrap: nowrap;
+}
+
+.bbe-bar__center select {
+  min-width: 0;
+  flex: 0 1 220px;
+}
+
+.bbe-bar__page {
+  flex: 0 1 220px;
+  min-width: 120px;
+}
+
+.bbe-bar__end {
+  flex: none;
+  white-space: nowrap;
 }

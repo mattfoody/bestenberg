@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="A brick oven with a loaf inside">
+  <rect width="800" height="600" fill="#e9edf2"/>
+  <rect x="150" y="110" width="500" height="400" rx="18" fill="#a4553b"/>
+  <g stroke="#8a4330" stroke-width="6">
+    <path d="M150 190h500M150 270h500M150 350h500M150 430h500"/>
+    <path d="M250 110v80M400 110v80M550 110v80M200 190v80M330 190v80M470 190v80M600 190v80M250 430v80M400 430v80M550 430v80"/>
+  </g>
+  <path d="M260 430V330a140 140 0 0 1 280 0v100z" fill="#2a2320"/>
+  <path d="M290 430v-96a110 110 0 0 1 220 0v96z" fill="#f08a2c"/>
+  <path d="M320 430v-80a80 80 0 0 1 160 0v80z" fill="#f6c453"/>
+  <ellipse cx="400" cy="412" rx="72" ry="26" fill="#b9772f"/>
+  <path d="M362 404q12-14 26-16M398 400q12-14 26-16" stroke="#f1d9ae" stroke-width="7" stroke-linecap="round" fill="none"/>
+  <rect x="120" y="510" width="560" height="26" rx="6" fill="#6f7d8c"/>
+</svg>

@@ -216,6 +216,11 @@ function build(expected) {
     const entries = listing.split('\n').filter(Boolean);
     const main = kind === 'plugin' ? 'bestenberg/bestenberg.php' : 'bestenberg/style.css';
     if (!entries.includes(main)) fail(`${file} is missing ${main}`);
+    if (kind === 'plugin') {
+      for (const needed of ['uninstall.php', 'demo/pages.json', 'templates/canvas.php']) {
+        if (!entries.includes(`bestenberg/${needed}`)) fail(`${file} is missing ${needed}`);
+      }
+    }
     if (entries.some((e) => /\/(tests|vendor|node_modules)\//.test(e)))
       fail(`${file} contains dev files`);
     console.log(`  ${kind}: ${file} (${entries.length} files)`);

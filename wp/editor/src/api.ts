@@ -139,6 +139,15 @@ export async function renderMarkup(markup: string, post: PostSummary | null): Pr
   return html;
 }
 
+/** Creates the demo pages that do not exist yet; returns the page to open (the front page). */
+export async function addDemoPages(): Promise<number> {
+  const { front, pages } = await apiFetch<{ front: number; pages: Array<{ id: number }> }>({
+    path: '/bestenberg/v1/demo',
+    method: 'POST',
+  });
+  return front > 0 ? front : (pages[0]?.id ?? 0);
+}
+
 /** Remembers that this user has seen the introduction for a mode. */
 export async function markOnboarded(mode: string): Promise<void> {
   await apiFetch({ path: '/bestenberg/v1/onboarding', method: 'POST', data: { mode } });

@@ -52,4 +52,5 @@ export function markupToNodes(markup: string, options: ConvertOptions = {}): Nod
 }
 
 export * from './dynamic';
+export * from './demo';
 export * from './theme';

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { defaultRegistry, validateDoc, walk, type Node } from '@bestenberg/schema';
 import { DYNAMIC_BLOCKS, markupBlockName, rawNode } from './dynamic';
 import { docToMarkup, markupToNodes, nodesToMarkup } from './index';
+import { DEMO_IMAGE_BASE, DEMO_PAGES } from './demo';
 import { THEME_FILES } from './theme';
 
 /** Types and raw markup in document order (ids of raw nodes are not stored, so they differ). */
@@ -68,5 +69,27 @@ describe('dynamic blocks', () => {
     const node = rawNode('<!-- wp:site-title /-->');
     expect(node).toMatchObject({ type: 'raw', props: { name: 'core/site-title' } });
     expect(nodesToMarkup([node])).toBe('<!-- wp:site-title /-->');
+  });
+});
+
+describe('demo site', () => {
+  it('has valid pages with stable ids that survive a round trip', () => {
+    expect(DEMO_PAGES.filter((page) => page.front)).toHaveLength(1);
+    const slugs = DEMO_PAGES.map((page) => page.slug);
+    expect(new Set(slugs).size).toBe(slugs.length);
+    for (const page of DEMO_PAGES) {
+      const check = validateDoc(page.doc, { registry: defaultRegistry });
+      expect(check.ok ? [] : check.issues).toEqual([]);
+      expect(page.doc.root[0]!.id).toBe(`demo-${page.slug}-0001`);
+      expect(markupToNodes(docToMarkup(page.doc))).toEqual(page.doc.root);
+    }
+  });
+
+  it('keeps no placeholder wording and points images at the demo folder', () => {
+    const markup = DEMO_PAGES.map((page) => docToMarkup(page.doc)).join('\n');
+    expect(markup).not.toContain('Get started');
+    expect(markup).not.toContain('href="#"');
+    expect(markup).toContain(`${DEMO_IMAGE_BASE}loaves.svg`);
+    expect(markup).toContain('"locked":"none"');
   });
 });
