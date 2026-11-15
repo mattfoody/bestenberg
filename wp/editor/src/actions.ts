@@ -1,4 +1,4 @@
-import type { Dispatch } from '@wordpress/element';
+import type { Dispatch } from 'react';
 import { docToMarkup, markupToNodes } from '@bestenberg/adapter-blocks';
 import {
   createNode,

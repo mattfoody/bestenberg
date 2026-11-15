@@ -1,4 +1,4 @@
-# TASKS.md — Bestenberg M0–M2
+# TASKS.md — Bestenberg
 
 > Work top to bottom. Tick boxes as you go. Stop at the end of each milestone, summarize, and wait for review. Specs: PLAN.md, SCHEMA.md.
 
@@ -59,3 +59,19 @@
 - [x] **2.8 Security.** Rich-text sanitization (allowed inline tags only) in TS and PHP; XSS payload tests in props, attributes and URLs.
 
 **Done when:** any valid schema doc round-trips losslessly, renders on the frontend with correct classes, and all tests pass in CI.
+
+---
+
+## M3 — Editor shell MVP
+
+- [x] **3.1 Document operations.** Pure, immutable ops in `@bestenberg/schema` (`ops.ts`): find/update/remove/insert/move/duplicate, allowed-children rules, control values with mobile-first inheritance, undo/redo history, insert placement. Component `defaults` for new nodes.
+- [x] **3.2 Client renderer.** `renderNodes()` in adapter-blocks produces the same HTML and classes as PHP, plus editor attributes (`data-bb-id`, `data-bb-text`, empty-container and raw placeholders).
+- [x] **3.3 Canvas route.** `/?bestenberg-canvas=<id>&_wpnonce=…` renders the real theme around an empty canvas root (nonce + `edit_post`), with full utility CSS. `POST bestenberg/v1/render` renders raw blocks.
+- [x] **3.4 Editor state.** Store (history, selection, viewport, scope, notices), REST load/save as block markup, page picker and new page.
+- [x] **3.5 Canvas.** Iframe with hover/selection, inline text editing (sanitized rich text, bold/italic), floating toolbar (move, duplicate, delete).
+- [x] **3.6 Structure panel.** Tree with selection, collapse, drag-and-drop that follows the registry's nesting rules, and an inserter.
+- [x] **3.7 Inspector.** Generated from the control registry: token selects and colour swatches, segmented, toggle, select, columns, text, link, media library.
+- [x] **3.8 Shell.** Top bar (viewport, "applies to" scope, undo/redo, view, save), keyboard shortcuts, unsaved-changes guard, "Edit with Bestenberg" row action.
+- [x] **3.9 Tests.** Unit tests for ops and renderer; PHPUnit for canvas access and render endpoint; e2e: build, style, save, frontend, reload.
+
+**Done when:** a page can be opened, edited on the canvas and in the inspector, saved as native blocks, and renders identically on the frontend.

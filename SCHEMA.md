@@ -122,6 +122,8 @@ UI rules:
 - Fixed group order: Content → Layout → Spacing → Typography → Color → Effects → Visibility → Data. Empty groups are hidden.
 - Controls write to the **schema node**; the adapter updates block attributes via the `core/block-editor` store. The editor never edits block attributes directly.
 - Responsive controls show which breakpoint they edit and a dot when an override exists; one click resets to base.
+- The editor writes style changes to `base` ("all sizes") unless the user switches the scope to "this size and up", which writes to the previewed breakpoint (`tablet` or `desktop`). On the mobile preview the scope is always all sizes.
+- New nodes start from the component's `defaults` (`props`, `style`, `children`). Document edits go through the pure operations in `packages/schema/src/ops.ts`.
 - `quick: true` controls also appear in a floating toolbar next to the selection (max ~5).
 - Shared control presets (`spacingControls`, `typographyControls`, …) keep components consistent.
 

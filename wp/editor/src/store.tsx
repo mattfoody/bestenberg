@@ -1,11 +1,5 @@
-import {
-  createContext,
-  useContext,
-  useMemo,
-  useReducer,
-  type Dispatch,
-  type ReactNode,
-} from '@wordpress/element';
+import { createContext, useContext, useMemo, useReducer } from '@wordpress/element';
+import type { Dispatch, ReactNode } from 'react';
 import {
   createHistory,
   findNode,

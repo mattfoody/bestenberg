@@ -335,6 +335,7 @@ export const button = defineComponent({
       label: 'Open in new tab',
       kind: 'toggle',
       path: 'props.target',
+      options: [{ value: '_blank', label: 'New tab' }],
     },
     {
       id: 'variant',

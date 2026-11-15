@@ -1,0 +1,120 @@
+<?php
+/**
+ * Editor canvas, render endpoint and background image tests (M3).
+ *
+ * @package Bestenberg
+ */
+
+declare( strict_types=1 );
+
+namespace Bestenberg\Tests\phpunit;
+
+use Bestenberg\Admin\EditorPage;
+use Bestenberg\Blocks\LayoutBlocks;
+use Bestenberg\Editor\Canvas;
+use WP_REST_Request;
+use WP_UnitTestCase;
+
+final class EditorTest extends WP_UnitTestCase {
+
+	public function tear_down(): void {
+		unset( $_GET[ Canvas::QUERY_ARG ], $_GET['_wpnonce'] );
+		parent::tear_down();
+	}
+
+	private function render_request( string $markup ): \WP_REST_Response {
+		$request = new WP_REST_Request( 'POST', '/bestenberg/v1/render' );
+		$request->set_param( 'markup', $markup );
+		return rest_get_server()->dispatch( $request );
+	}
+
+	public function test_render_endpoint_requires_an_editor(): void {
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'subscriber' ) ) );
+		$this->assertSame( 403, $this->render_request( '<!-- wp:paragraph --><p>x</p><!-- /wp:paragraph -->' )->get_status() );
+
+		wp_set_current_user( 0 );
+		$this->assertSame( 401, $this->render_request( '<!-- wp:paragraph --><p>x</p><!-- /wp:paragraph -->' )->get_status() );
+	}
+
+	public function test_render_endpoint_renders_blocks(): void {
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'editor' ) ) );
+		$response = $this->render_request( '<!-- wp:paragraph --><p>Hello</p><!-- /wp:paragraph -->' );
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertStringContainsString( '<p>Hello</p>', $response->get_data()['html'] );
+	}
+
+	public function test_render_endpoint_filters_html_for_users_without_unfiltered_html(): void {
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'author' ) ) );
+		$response = $this->render_request( '<!-- wp:html --><script>alert(1)</script><p>ok</p><!-- /wp:html -->' );
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertStringNotContainsString( '<script', $response->get_data()['html'] );
+	}
+
+	public function test_canvas_url_carries_post_and_nonce(): void {
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+		$post_id = self::factory()->post->create( array( 'post_type' => 'page' ) );
+		$url     = Canvas::url( $post_id );
+		parse_str( (string) wp_parse_url( $url, PHP_URL_QUERY ), $query );
+
+		$this->assertSame( (string) $post_id, $query[ Canvas::QUERY_ARG ] );
+		$this->assertSame( 1, wp_verify_nonce( $query['_wpnonce'], Canvas::NONCE_ACTION ) );
+	}
+
+	public function test_canvas_request_is_ignored_without_a_valid_nonce(): void {
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+		$post_id                   = self::factory()->post->create( array( 'post_type' => 'page' ) );
+		$_GET[ Canvas::QUERY_ARG ] = (string) $post_id;
+		$_GET['_wpnonce']          = 'invalid';
+
+		$this->go_to( add_query_arg( Canvas::QUERY_ARG, $post_id, home_url( '/' ) ) );
+
+		$this->assertFalse( is_page( $post_id ) );
+	}
+
+	public function test_canvas_request_is_ignored_for_users_who_cannot_edit_the_post(): void {
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'subscriber' ) ) );
+		$post_id                   = self::factory()->post->create( array( 'post_type' => 'page' ) );
+		$_GET[ Canvas::QUERY_ARG ] = (string) $post_id;
+		$_GET['_wpnonce']          = wp_create_nonce( Canvas::NONCE_ACTION );
+
+		$this->go_to( add_query_arg( Canvas::QUERY_ARG, $post_id, home_url( '/' ) ) );
+
+		$this->assertFalse( is_page( $post_id ) );
+	}
+
+	public function test_canvas_request_shows_the_post_to_its_editor(): void {
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+		$post_id                   = self::factory()->post->create(
+			array(
+				'post_type'   => 'page',
+				'post_status' => 'draft',
+			)
+		);
+		$_GET[ Canvas::QUERY_ARG ] = (string) $post_id;
+		$_GET['_wpnonce']          = wp_create_nonce( Canvas::NONCE_ACTION );
+
+		$this->go_to( add_query_arg( Canvas::QUERY_ARG, $post_id, home_url( '/' ) ) );
+
+		$this->assertTrue( is_page( $post_id ) );
+		$this->assertContains( 'bb-canvas', get_body_class() );
+	}
+
+	public function test_editor_url_opens_a_post(): void {
+		$this->assertStringContainsString( 'page=' . EditorPage::SLUG, EditorPage::url() );
+		$this->assertStringContainsString( 'post=12', EditorPage::url( 12 ) );
+	}
+
+	public function test_background_image_style(): void {
+		$this->assertNull( LayoutBlocks::background_image( null ) );
+		$this->assertNull( LayoutBlocks::background_image( array( 'base' => array() ) ) );
+		$this->assertSame(
+			'https://example.com/it%27s%20%281%29.jpg',
+			LayoutBlocks::background_image( array( 'base' => array( 'background' => array( 'image' => array( 'url' => "https://example.com/it's (1).jpg" ) ) ) ) )
+		);
+		$this->assertNull(
+			LayoutBlocks::background_image( array( 'base' => array( 'background' => array( 'image' => array( 'url' => 'javascript:alert(1)' ) ) ) ) )
+		);
+	}
+}
