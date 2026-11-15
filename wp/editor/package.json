@@ -11,6 +11,9 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@bestenberg/adapter-blocks": "workspace:*",
+    "@bestenberg/schema": "workspace:*",
+    "@bestenberg/tokens": "workspace:*",
     "@wordpress/element": "^6.20.0"
   },
   "devDependencies": {

@@ -1,0 +1,77 @@
+/*
+ * Editor canvas affordances. Loaded only inside the editor's iframe
+ * (body.bb-canvas), never for visitors.
+ */
+.bb-canvas [data-bb-id] {
+  cursor: default;
+}
+
+.bb-canvas [data-bb-hover] {
+  outline: 1px dashed #e6007e;
+  outline-offset: -1px;
+}
+
+.bb-canvas [data-bb-selected] {
+  outline: 2px solid #e6007e;
+  outline-offset: -2px;
+}
+
+.bb-canvas [data-bb-text][contenteditable] {
+  cursor: text;
+  outline: none;
+}
+
+/* Empty containers stay visible and clickable. */
+.bb-canvas .bb-empty {
+  min-height: 72px;
+  background-image: repeating-linear-gradient(
+    -45deg,
+    rgb(22 32 46 / 0.04) 0 8px,
+    transparent 8px 16px
+  );
+}
+
+.bb-canvas #bb-canvas-root:empty::before {
+  content: 'This page is empty. Add a section from the panel on the left.';
+  display: block;
+  padding: 96px 24px;
+  text-align: center;
+  color: #5b6675;
+  font:
+    16px/1.5 system-ui,
+    sans-serif;
+}
+
+/* Blocks Bestenberg does not edit: shown as rendered by WordPress, not interactive inside. */
+.bb-canvas .bb-raw {
+  position: relative;
+  min-height: 48px;
+}
+
+.bb-canvas .bb-raw > * {
+  pointer-events: none;
+}
+
+.bb-canvas .bb-raw:empty::before {
+  content: attr(data-bb-raw);
+  display: block;
+  padding: 12px 16px;
+  color: #5b6675;
+  font:
+    13px/1.4 system-ui,
+    sans-serif;
+  background: rgb(22 32 46 / 0.05);
+}
+
+.bb-canvas img[src=''] {
+  display: block;
+  width: 100%;
+  min-height: 160px;
+  background: rgb(22 32 46 / 0.06);
+}
+
+/* Visibility utilities hide for visitors; in the editor hidden elements stay reachable. */
+.bb-canvas [data-bb-id][class*='hidden'] {
+  display: revert !important;
+  opacity: 0.35;
+}

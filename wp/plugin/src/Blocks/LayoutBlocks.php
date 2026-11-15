@@ -144,6 +144,10 @@ final class LayoutBlocks {
 		if ( isset( $props['anchor'] ) && is_string( $props['anchor'] ) && 1 === preg_match( '/^[A-Za-z][\w-]*$/', $props['anchor'] ) ) {
 			$extra['id'] = $props['anchor'];
 		}
+		$background = self::background_image( $attributes['style'] ?? null );
+		if ( null !== $background ) {
+			$extra['style'] = "background-image:url('" . $background . "')";
+		}
 		foreach ( $config['attributes'] as $attribute => $value ) {
 			$extra[ $attribute ] = $value;
 		}
@@ -154,5 +158,33 @@ final class LayoutBlocks {
 			get_block_wrapper_attributes( $extra ),
 			$config['container'] ? $content : ''
 		);
+	}
+
+	/**
+	 * URL of the background image of the first breakpoint that sets one,
+	 * encoded for use inside url('…'). Mirrors backgroundImageStyle() in TS.
+	 *
+	 * @param mixed $style Responsive style attribute.
+	 */
+	public static function background_image( mixed $style ): ?string {
+		if ( ! is_array( $style ) ) {
+			return null;
+		}
+		foreach ( array( 'base', 'tablet', 'desktop' ) as $breakpoint ) {
+			$url = $style[ $breakpoint ]['background']['image']['url'] ?? null;
+			if ( ! is_string( $url ) || '' === $url ) {
+				continue;
+			}
+			$safe = esc_url_raw( $url, array( 'http', 'https' ) );
+			if ( '' === $safe ) {
+				continue;
+			}
+			return str_replace(
+				array( "'", '\\', '(', ')', ' ' ),
+				array( '%27', '%5C', '%28', '%29', '%20' ),
+				$safe
+			);
+		}
+		return null;
 	}
 }

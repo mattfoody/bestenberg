@@ -21,6 +21,7 @@ export * from './core-blocks';
 export * from './markup';
 export * from './convert';
 export * from './metadata';
+export * from './render';
 
 /** Block namespace for Bestenberg's own blocks. */
 export const BLOCK_NAMESPACE = 'bestenberg' as const;

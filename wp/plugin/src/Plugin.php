@@ -12,6 +12,8 @@ namespace Bestenberg;
 use Bestenberg\Admin\EditorPage;
 use Bestenberg\Blocks\CoreBlockStyles;
 use Bestenberg\Blocks\LayoutBlocks;
+use Bestenberg\Editor\Canvas;
+use Bestenberg\Rest\RenderController;
 use Bestenberg\Styles\Collector;
 use Bestenberg\Styles\StyleClasses;
 use Bestenberg\Styles\StyleOutput;
@@ -71,6 +73,8 @@ final class Plugin {
 		( new StyleOutput( $this->collector(), $utilities ) )->register();
 		( new LayoutBlocks( $config['blocks'], $style_classes, $this->collector() ) )->register();
 		( new CoreBlockStyles( $config['core'], $style_classes, $this->collector() ) )->register();
+		( new Canvas() )->register();
+		( new RenderController() )->register();
 		Updater::from_plugin_header()?->register();
 	}
 

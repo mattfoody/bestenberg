@@ -9,13 +9,15 @@ declare( strict_types=1 );
 
 namespace Bestenberg\Admin;
 
+use Bestenberg\Editor\Canvas;
+
 /**
  * Registers the "Bestenberg" admin page and mounts the React editor app.
  */
 final class EditorPage {
 
 	public const SLUG       = 'bestenberg';
-	public const CAPABILITY = 'edit_theme_options';
+	public const CAPABILITY = 'edit_pages';
 	public const ROOT_ID    = 'bestenberg-root';
 	public const HANDLE     = 'bestenberg-editor';
 
@@ -33,6 +35,8 @@ final class EditorPage {
 		add_action( 'admin_menu', array( $this, 'add_menu_page' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_assets' ) );
 		add_filter( 'admin_body_class', array( $this, 'body_class' ) );
+		add_filter( 'page_row_actions', array( $this, 'row_action' ), 10, 2 );
+		add_filter( 'post_row_actions', array( $this, 'row_action' ), 10, 2 );
 	}
 
 	/**
@@ -101,6 +105,13 @@ final class EditorPage {
 			array( 'in_footer' => true )
 		);
 
+		wp_enqueue_media();
+		wp_add_inline_script(
+			self::HANDLE,
+			'window.bestenbergEditor = ' . wp_json_encode( $this->settings() ) . ';',
+			'before'
+		);
+
 		if ( is_readable( BESTENBERG_DIR . 'build/editor/index.css' ) ) {
 			wp_enqueue_style(
 				self::HANDLE,
@@ -109,6 +120,75 @@ final class EditorPage {
 				$asset['version']
 			);
 		}
+	}
+
+	/**
+	 * URL of the editor, optionally opened on a post.
+	 *
+	 * @param int $post_id Post to open (0 = none).
+	 */
+	public static function url( int $post_id = 0 ): string {
+		$args = array( 'page' => self::SLUG );
+		if ( $post_id > 0 ) {
+			$args['post'] = $post_id;
+		}
+		return add_query_arg( $args, admin_url( 'admin.php' ) );
+	}
+
+	/**
+	 * Data the editor app starts with.
+	 *
+	 * @return array<string, mixed>
+	 */
+	private function settings(): array {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only navigation parameter.
+		$post_id = isset( $_GET['post'] ) ? absint( wp_unslash( $_GET['post'] ) ) : 0;
+		if ( $post_id > 0 && ! current_user_can( 'edit_post', $post_id ) ) {
+			$post_id = 0;
+		}
+		return array(
+			'version'     => BESTENBERG_VERSION,
+			'postId'      => $post_id,
+			'postRest'    => self::rest_base( $post_id ),
+			'homeUrl'     => home_url( '/' ),
+			'canvasNonce' => wp_create_nonce( Canvas::NONCE_ACTION ),
+			'canvasArg'   => Canvas::QUERY_ARG,
+			'canvasRoot'  => Canvas::ROOT_ID,
+			'editorUrl'   => self::url(),
+			'adminUrl'    => admin_url(),
+			'canDesign'   => current_user_can( 'edit_theme_options' ),
+		);
+	}
+
+	/**
+	 * REST base of a post's type ("pages", "posts"), or '' if unknown.
+	 *
+	 * @param int $post_id Post ID.
+	 */
+	private static function rest_base( int $post_id ): string {
+		$type = $post_id > 0 ? get_post_type_object( (string) get_post_type( $post_id ) ) : null;
+		if ( null === $type ) {
+			return '';
+		}
+		return is_string( $type->rest_base ) && '' !== $type->rest_base ? $type->rest_base : $type->name;
+	}
+
+	/**
+	 * Adds "Edit with Bestenberg" to the pages and posts lists.
+	 *
+	 * @param array<string, string> $actions Row actions.
+	 * @param \WP_Post              $post    Post.
+	 * @return array<string, string>
+	 */
+	public function row_action( array $actions, \WP_Post $post ): array {
+		if ( in_array( $post->post_type, array( 'page', 'post' ), true ) && current_user_can( 'edit_post', $post->ID ) ) {
+			$actions['bestenberg'] = sprintf(
+				'<a href="%s">%s</a>',
+				esc_url( self::url( $post->ID ) ),
+				esc_html__( 'Edit with Bestenberg', 'bestenberg' )
+			);
+		}
+		return $actions;
 	}
 
 	/**

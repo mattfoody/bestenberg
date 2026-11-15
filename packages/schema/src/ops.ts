@@ -344,3 +344,37 @@ export function redo<T>(history: History<T>): History<T> {
     future: history.future.slice(1),
   };
 }
+
+// ── Insert placement ────────────────────────────────────────────────────────
+
+export interface Placement {
+  parentId: string | null;
+  index: number;
+}
+
+/**
+ * Where a new node of `type` goes given the current selection: inside the
+ * selected node if it accepts it, otherwise after the nearest ancestor-or-self
+ * whose parent accepts it, otherwise at the end of the page. Null if nowhere.
+ */
+export function insertPlacement(
+  doc: Doc,
+  registry: Registry,
+  selectedId: string | null,
+  type: string,
+): Placement | null {
+  const selected = selectedId === null ? null : findNode(doc.root, selectedId);
+  if (selected) {
+    if (canContain(registry, selected.node.type, type)) {
+      return { parentId: selected.node.id, index: selected.node.children?.length ?? 0 };
+    }
+    let current: Located | null = selected;
+    while (current) {
+      if (canContain(registry, current.parent?.type ?? null, type)) {
+        return { parentId: current.parent?.id ?? null, index: current.index + 1 };
+      }
+      current = current.parent ? findNode(doc.root, current.parent.id) : null;
+    }
+  }
+  return canContain(registry, null, type) ? { parentId: null, index: doc.root.length } : null;
+}

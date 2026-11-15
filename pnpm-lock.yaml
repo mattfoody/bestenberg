@@ -73,6 +73,15 @@ importers:
 
   wp/editor:
     dependencies:
+      '@bestenberg/adapter-blocks':
+        specifier: workspace:*
+        version: link:../../packages/adapter-blocks
+      '@bestenberg/schema':
+        specifier: workspace:*
+        version: link:../../packages/schema
+      '@bestenberg/tokens':
+        specifier: workspace:*
+        version: link:../../packages/tokens
       '@wordpress/element':
         specifier: ^6.20.0
         version: 6.46.0

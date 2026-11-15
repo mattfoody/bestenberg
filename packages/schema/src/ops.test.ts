@@ -10,6 +10,7 @@ import {
   findNode,
   getControlValue,
   insertableTypes,
+  insertPlacement,
   insertNode,
   moveNode,
   pushHistory,
@@ -147,6 +148,41 @@ describe('createNode / insertNode', () => {
     expect(() => insertNode(doc(), registry, 'head1', 0, node)).toThrow('cannot be placed');
     expect(() => insertNode(doc(), registry, 'sec1', 0, createNode(registry, 'button'))).toThrow();
     expect(() => insertNode(doc(), registry, 'nope', 0, node)).toThrow('Unknown parent');
+  });
+});
+
+describe('insertPlacement', () => {
+  it('goes inside a selected container', () => {
+    expect(insertPlacement(doc(), registry, 'sec1', 'text')).toEqual({
+      parentId: 'sec1',
+      index: 3,
+    });
+    expect(insertPlacement(doc(), registry, 'bgrp1', 'button')).toEqual({
+      parentId: 'bgrp1',
+      index: 1,
+    });
+  });
+
+  it('goes after the selection when the selection cannot contain it', () => {
+    expect(insertPlacement(doc(), registry, 'head1', 'text')).toEqual({
+      parentId: 'sec1',
+      index: 1,
+    });
+    expect(insertPlacement(doc(), registry, 'btn1', 'button')).toEqual({
+      parentId: 'bgrp1',
+      index: 1,
+    });
+    // A heading cannot sit in a button group: it lands after the group.
+    expect(insertPlacement(doc(), registry, 'btn1', 'heading')).toEqual({
+      parentId: 'sec1',
+      index: 3,
+    });
+  });
+
+  it('falls back to the end of the page, or nowhere', () => {
+    expect(insertPlacement(doc(), registry, null, 'section')).toEqual({ parentId: null, index: 2 });
+    expect(insertPlacement(doc(), registry, null, 'button')).toBeNull();
+    expect(insertPlacement(doc(), registry, 'head1', 'list-item')).toBeNull();
   });
 });
 
